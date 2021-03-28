@@ -1,8 +1,6 @@
-using System;
-
 namespace CapWatchBackend {
-  public class Shop {
-    public String Name { get; set; }
+  public class Store {
+    public string Name { get; set; }
 
     public int MaxCapacity { get; set; }
 
