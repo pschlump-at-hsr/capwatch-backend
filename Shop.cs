@@ -7,5 +7,7 @@ namespace CapWatchBackend {
     public int MaxCapacity { get; set; }
 
     public int CurrentCapacity { get; set; }
+
+    public int Secret { get; set; }
   }
 }
