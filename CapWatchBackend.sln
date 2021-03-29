@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapWatchBackend", "CapWatchBackend.csproj", "{9A769FC9-AF03-4D83-A920-1D2908D53477}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.Domain", "CapWatchBackend.Domain\CapWatchBackend.Domain.csproj", "{A4157757-9E9B-4FC6-B63A-BDD567F48644}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.Application", "CapWatchBackend.Application\CapWatchBackend.Application.csproj", "{5D68DB7D-ACA5-4CCD-B308-2B08AE0C26A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.DataAccess.MongoDB", "CapWatchBackend.DataAccess.MongoDB\CapWatchBackend.DataAccess.MongoDB.csproj", "{987354C9-2CCD-4AA6-990E-D9F7EF48D2C4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.WebApi", "CapWatchBackend.WebApi\CapWatchBackend.WebApi.csproj", "{85A485B0-0ECE-4BA2-8732-721AD525B4AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +17,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9A769FC9-AF03-4D83-A920-1D2908D53477}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9A769FC9-AF03-4D83-A920-1D2908D53477}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9A769FC9-AF03-4D83-A920-1D2908D53477}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9A769FC9-AF03-4D83-A920-1D2908D53477}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4157757-9E9B-4FC6-B63A-BDD567F48644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4157757-9E9B-4FC6-B63A-BDD567F48644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4157757-9E9B-4FC6-B63A-BDD567F48644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4157757-9E9B-4FC6-B63A-BDD567F48644}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D68DB7D-ACA5-4CCD-B308-2B08AE0C26A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D68DB7D-ACA5-4CCD-B308-2B08AE0C26A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D68DB7D-ACA5-4CCD-B308-2B08AE0C26A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D68DB7D-ACA5-4CCD-B308-2B08AE0C26A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{987354C9-2CCD-4AA6-990E-D9F7EF48D2C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{987354C9-2CCD-4AA6-990E-D9F7EF48D2C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{987354C9-2CCD-4AA6-990E-D9F7EF48D2C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{987354C9-2CCD-4AA6-990E-D9F7EF48D2C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
