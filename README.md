@@ -18,4 +18,4 @@ Extensions -> Manage Extensions -> Search *Power Commands for Visual Studio* -> 
 # Build and run Docker Container
 
 docker build -t capwatchbackend .
-docker run -d -p 8080:80 --name capwatchbackend capwatchbackend
+docker run -d -p 8080:5000 --name capwatchbackend capwatchbackend
