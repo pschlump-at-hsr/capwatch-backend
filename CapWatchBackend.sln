@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.DataAccess.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.WebApi", "CapWatchBackend.WebApi\CapWatchBackend.WebApi.csproj", "{85A485B0-0ECE-4BA2-8732-721AD525B4AA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1735E2A2-AAD6-4A66-8D1F-D9B15C9CA257}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapWatchBackend.WebApi.Tests", "CapWatchBackend.WebApi.Tests\CapWatchBackend.WebApi.Tests.csproj", "{5370C7F1-81CD-4AC9-BE31-92AC3239245C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +37,16 @@ Global
 		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85A485B0-0ECE-4BA2-8732-721AD525B4AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5370C7F1-81CD-4AC9-BE31-92AC3239245C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5370C7F1-81CD-4AC9-BE31-92AC3239245C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5370C7F1-81CD-4AC9-BE31-92AC3239245C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5370C7F1-81CD-4AC9-BE31-92AC3239245C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5370C7F1-81CD-4AC9-BE31-92AC3239245C} = {1735E2A2-AAD6-4A66-8D1F-D9B15C9CA257}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B4D06E6-BB39-4766-AA08-BB34AFC3F9A6}
