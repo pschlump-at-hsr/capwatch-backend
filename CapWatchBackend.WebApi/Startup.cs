@@ -45,7 +45,7 @@ namespace CapWatchBackend.WebApi {
       });
     }
 
-    private void RegisterDependencies(IServiceCollection services) {
+    protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
     }
   }
