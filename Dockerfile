@@ -1,27 +1,21 @@
-﻿# https://medium.com/@oluwabukunmi.aluko/dockerize-asp-net-core-web-app-with-multiple-layers-projects-part1-2256aa1b0511
-
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
+﻿FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
 WORKDIR /app
 
-COPY *.sln .
+COPY *.sln ./
 COPY CapWatchBackend.Application/*.csproj ./CapWatchBackend.Application/
 COPY CapWatchBackend.DataAccess.MongoDB/*.csproj ./CapWatchBackend.DataAccess.MongoDB/
 COPY CapWatchBackend.Domain/*.csproj ./CapWatchBackend.Domain/
 COPY CapWatchBackend.WebApi/*.csproj ./CapWatchBackend.WebApi/
+COPY CapWatchBackend.WebApi.Tests/*.csproj ./CapWatchBackend.WebApi.Tests/
 
 RUN dotnet restore
 
-COPY CapWatchBackend.Application/. ./CapWatchBackend.Application/
-COPY CapWatchBackend.DataAccess.MongoDB/. ./CapWatchBackend.DataAccess.MongoDB/
-COPY CapWatchBackend.Domain/. ./CapWatchBackend.Domain/
-COPY CapWatchBackend.WebApi/. ./CapWatchBackend.WebApi/
-
-WORKDIR /app/CapWatchBackend.WebApi
+COPY . ./
 RUN dotnet publish -c Release -o out
 
+EXPOSE 80
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0
+FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app
-
-COPY --from=build-env /app/CapWatchBackend.WebApi/out .
+COPY --from=build-env /app/out .
 ENTRYPOINT ["dotnet", "CapWatchBackend.WebApi.dll"]
