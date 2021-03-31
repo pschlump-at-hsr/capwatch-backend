@@ -51,16 +51,16 @@ Push latest:
     # Annnd we push it.
     - docker push $CI_REGISTRY_IMAGE:latest
 
-# Here, the goal is to tag the "development" branch as "develop"
-Push development:
+# Here, the goal is to tag the "develop" branch as "develop"
+Push develop:
   variables:
     # We are just playing with Docker here. 
     # We do not need GitLab to clone the source code.
     GIT_STRATEGY: none
   stage: push
   only:
-    # Only "development" should be tagged "develop"
-    - development
+    # Only "develop" should be tagged "develop"
+    - develop
   script:
     # Because we have no guarantee that this job will be picked up by the same runner 
     # that built the image in the previous step, we pull it again locally
