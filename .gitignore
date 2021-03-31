@@ -1,3 +1,5 @@
+/CapWatchBackend.DataAccess.MongoDB/images/mongodb-persistence
+
 *.swp
 *.*~
 project.lock.json
