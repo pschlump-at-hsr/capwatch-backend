@@ -12,13 +12,13 @@ using System.Linq;
 namespace CapWatchBackend.DataAccess.MongoDB.Model {
   public class StoreModel {
     private static StoreModel _instance;
-    private const string connectionString = "mongodb://capwusr:capwusr123@localhost:27017/admin"; //TODO: Auslagern in Settingsobjekt
-    private MongoClient client;
-    private IMongoCollection<StoreDto> storesCol;
-    private IMongoCollection<CapacityDto> capacitiesCol;
+    private const string _connectionString = "mongodb://capwusr:capwusr123@localhost:27017/admin"; //TODO: Auslagern in Settingsobjekt
+    private MongoClient _client;
+    private IMongoCollection<StoreDto> _storesCol;
+    private IMongoCollection<CapacityDto> _capacitiesCol;
     private StoreModel() {
       try { //TODO: Errorhandling ausbauen
-        client = new MongoClient(connectionString);
+        _client = new MongoClient(_connectionString);
       } catch (MongoClientException e) {
         Console.WriteLine("Error opening Database. Message = {0}", e.Message);
       }
@@ -26,22 +26,19 @@ namespace CapWatchBackend.DataAccess.MongoDB.Model {
       BsonClassMap.RegisterClassMap<StoreDto>(
        map => {
          map.MapProperty(x => x.Name).SetElementName("name");
-         map.MapProperty(x => x.Secret).SetElementName("secret");
-         map.MapProperty(x => x.Id).SetElementName("_id")
-             .SetSerializer(new GuidSerializer(BsonType.String));
+         map.MapProperty(x => x.Secret).SetElementName("secret")
+         .SetSerializer(new GuidSerializer(BsonType.String));
+         map.MapProperty(x => x.Id).SetElementName("_id");
        });
 
       BsonClassMap.RegisterClassMap<CapacityDto>(
       map => {
-
-        map.MapProperty(x => x.Id).SetElementName("_id")
-            .SetSerializer(new GuidSerializer(BsonType.String));
-        map.MapProperty(x => x.StoreId).SetElementName("storeId")
-            .SetSerializer(new GuidSerializer(BsonType.String));
+        map.MapProperty(x => x.Id).SetElementName("_id");
+        map.MapProperty(x => x.StoreId).SetElementName("storeId");
       });
-      var database = client.GetDatabase("capwatchDB");
-      storesCol = database.GetCollection<StoreDto>("stores").WithWriteConcern(WriteConcern.WMajority);
-      capacitiesCol = database.GetCollection<CapacityDto>("capacities").WithWriteConcern(WriteConcern.WMajority);
+      var database = _client.GetDatabase("capwatchDB");
+      _storesCol = database.GetCollection<StoreDto>("stores").WithWriteConcern(WriteConcern.WMajority);
+      _capacitiesCol = database.GetCollection<CapacityDto>("capacities").WithWriteConcern(WriteConcern.WMajority);
     }
 
     public static StoreModel GetStoreModel() {
@@ -53,11 +50,11 @@ namespace CapWatchBackend.DataAccess.MongoDB.Model {
 
     public IEnumerable<Store> GetStores() {
       var filter = Builders<StoreDto>.Filter.Empty;
-      var query = storesCol.Find(filter).ToList();
+      var query = _storesCol.Find(filter).ToList();
       List<Store> stores = new List<Store>();
       foreach (var store in query) {
-        var capacity = capacitiesCol.AsQueryable().Where(x => x.StoreId == store.Id).MaxBy(x => x.Timestamp).FirstOrDefault();
-        stores.Add(new Store { Name = store.Name, CurrentCapacity = capacity.Capacity, MaxCapacity = capacity.MaxCapacity, Id = store.Secret });
+        var capacity = _capacitiesCol.AsQueryable().Where(x => x.StoreId == store.Id).MaxBy(x => x.Timestamp).FirstOrDefault();
+        stores.Add(new Store { Name = store.Name, CurrentCapacity = capacity.Capacity, MaxCapacity = capacity.MaxCapacity, Id = store.Id });
       }
       return stores;
     }

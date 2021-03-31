@@ -3,9 +3,9 @@
 namespace CapWatchBackend.DataAccess.MongoDB.ModelClasses {
   class CapacityDto {
 
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
-    public Guid StoreId { get; set; }
+    public int StoreId { get; set; }
 
     public int Capacity { get; set; }
 
