@@ -30,6 +30,8 @@ Build:
       --cache-from $CI_REGISTRY_IMAGE:latest
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
 
 
 # Here, the goal is to tag the "master" branch as "latest"
