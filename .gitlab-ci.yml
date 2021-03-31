@@ -21,8 +21,7 @@ Build:
     - docker pull $CI_REGISTRY_IMAGE:latest || true
     # builds the project, passing proxy variables, and vcs vars for LABEL
     # notice the cache-from, which is going to use the image we just pulled locally
-    # the built image is tagged locally with the commit SHA, and then pushed to 
-    # the GitLab registry
+    # the built image is tagged locally with the commit SHA.
     - >
       docker build
       --pull
@@ -31,7 +30,7 @@ Build:
       --cache-from $CI_REGISTRY_IMAGE:latest
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
 
 # Here, the goal is to tag the "master" branch as "latest"
 Push latest:
