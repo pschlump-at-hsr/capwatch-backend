@@ -17,5 +17,5 @@ Extensions -> Manage Extensions -> Search *Power Commands for Visual Studio* -> 
 
 # Build and run Docker Container
 
-docker build -t capwatch-backend-image .
+docker build -t capwatch-backend-image .\
 docker run -d -p 8080:80 --name capwatch-backend capwatch-backend-image
