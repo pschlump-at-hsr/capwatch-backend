@@ -1,4 +1,4 @@
-image: docker:18
+image: docker:latest
 
 stages:
   - build
@@ -11,7 +11,6 @@ stages:
 before_script:
   # docker login asks for the password to be passed through stdin for security
   # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
-  - echo $CI_REGISTRY
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
 Build:
