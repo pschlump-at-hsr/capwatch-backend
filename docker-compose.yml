@@ -15,7 +15,7 @@ services:
       - capwatch
   db:
     container_name: capwatch-database
-    image: 'docker.io/bitnami/mongodb:4.2'
+    image: 'docker.io/bitnami/mongodb:4.4'
     ports:
       - "27017:27017"
     volumes:
