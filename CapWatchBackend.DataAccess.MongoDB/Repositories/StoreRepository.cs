@@ -6,8 +6,8 @@ using System.Collections.Generic;
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class StoreRepository : IStoreRepository {
     public IEnumerable<Store> GetStores() {
-      var sm = StoreModel.GetStoreModel();
-      return sm.GetStores();
+      var storeModel = StoreModel.GetStoreModel();
+      return storeModel.GetStores();
     }
   }
 }

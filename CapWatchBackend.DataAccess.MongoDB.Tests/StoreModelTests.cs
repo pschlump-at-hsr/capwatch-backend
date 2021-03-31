@@ -1,4 +1,5 @@
 using CapWatchBackend.DataAccess.MongoDB.Model;
+using FluentAssertions;
 using Xunit;
 
 namespace CapWatchBackend.DataAccess.MongoDB.Tests {
@@ -12,7 +13,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
 
     [Fact]
     public void TestGetStores() {
-      sm.GetStores();
+      sm.GetStores().Should().NotBeNull();
     }
   }
 }
