@@ -12,7 +12,7 @@ using System.Linq;
 namespace CapWatchBackend.DataAccess.MongoDB.Model {
   public class StoreModel {
     private static StoreModel _instance;
-    private const string _connectionString = "mongodb://capwusr:capwusr123@localhost:27017/admin"; //TODO: Auslagern in Settingsobjekt
+    private const string _connectionString = "mongodb://capwusr:capwusr123@db:27017/admin"; //TODO: Auslagern in Settingsobjekt
     private MongoClient _client;
     private IMongoCollection<StoreDto> _storesCol;
     private IMongoCollection<CapacityDto> _capacitiesCol;
