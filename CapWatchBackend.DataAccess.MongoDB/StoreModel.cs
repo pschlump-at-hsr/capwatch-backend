@@ -35,6 +35,9 @@ namespace CapWatchBackend.DataAccess.MongoDB.Model {
       map => {
         map.MapProperty(x => x.Id).SetElementName("_id");
         map.MapProperty(x => x.StoreId).SetElementName("storeId");
+        map.MapProperty(x => x.Capacity).SetElementName("capacity");
+        map.MapProperty(x => x.MaxCapacity).SetElementName("maxCapacity");
+        map.MapProperty(x => x.Timestamp).SetElementName("timestamp");
       });
       var database = _client.GetDatabase("capwatchDB");
       _storesCol = database.GetCollection<StoreDto>("stores").WithWriteConcern(WriteConcern.WMajority);
