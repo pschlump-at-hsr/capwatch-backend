@@ -15,8 +15,20 @@ namespace CapWatchBackend.WebApi {
 
     public IConfiguration Configuration { get; }
 
+    public string CorsOrigins = "allowDev";
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services) {
+      services.AddCors(options =>
+      {
+        options.AddPolicy(CorsOrigins, builder =>
+        {
+          builder.AllowAnyOrigin()
+          .AllowAnyHeader()
+          .AllowAnyMethod();
+        });
+      });
+
       RegisterDependencies(services);
 
       services.AddControllers();
@@ -28,6 +40,9 @@ namespace CapWatchBackend.WebApi {
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+
+      app.UseCors(CorsOrigins);
+
       if (env.IsDevelopment()) {
         app.UseDeveloperExceptionPage();
         app.UseSwagger();
