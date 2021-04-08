@@ -8,6 +8,7 @@ namespace CapWatchBackend.WebApi.Models {
       Name = store.Name;
       Street = store.Street;
       ZipCode = store.ZipCode;
+      City = store.City;
       MaxCapacity = store.MaxCapacity;
       CurrentCapacity = store.CurrentCapacity;
       Logo = store.Logo;
