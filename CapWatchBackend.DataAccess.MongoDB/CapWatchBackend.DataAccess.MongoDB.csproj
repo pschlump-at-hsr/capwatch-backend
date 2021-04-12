@@ -5,9 +5,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="dbSettings.settings" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CapWatchBackend.Application\CapWatchBackend.Application.csproj" />
 	<PackageReference Include="MongoDB.Driver" Version="2.12.1" />
 	<PackageReference Include="morelinq" Version="3.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="dbSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>dbSettings.Designer.cs</LastGenOutput>
+    </Resource>
   </ItemGroup>
 
 </Project>
