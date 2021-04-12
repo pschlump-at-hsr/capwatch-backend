@@ -7,7 +7,8 @@ using MongoDB.Driver;
 namespace CapWatchBackend.DataAccess.MongoDB {
   class CapwatchDbo {
 
-    private string _connectionString = "mongodb://capwusr:capwusr123@localhost:27017/admin";
+    private static string _connectionString;
+
     private static CapwatchDbo _instance;
     private MongoClient _client;
     private IMongoDatabase _database;
@@ -21,7 +22,8 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       }
     }
 
-    public static CapwatchDbo GetInstance() {
+    public static CapwatchDbo GetInstance(string connectionString) {
+      _connectionString = connectionString;
       if (_instance == null) {
         _instance = new CapwatchDbo();
       }

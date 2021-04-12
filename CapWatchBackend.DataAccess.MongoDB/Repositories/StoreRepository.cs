@@ -1,5 +1,6 @@
 ﻿using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.Domain.Entities;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MoreLinq;
@@ -12,9 +13,15 @@ using System.Threading.Tasks;
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class StoreRepository : IStoreRepository {
     private IMongoCollection<Store> _storesCol;
+    private readonly ConfigureDatabase _configureDatabase;
+    public StoreRepository(IOptions<ConfigureDatabase> options) {
+      _configureDatabase = options.Value;
+      var capWatchDbo = CapwatchDbo.GetInstance(_configureDatabase.ConnectionString);
+      _storesCol = capWatchDbo.GetStoreCollection();
+    }
 
-    public StoreRepository() {
-      var capWatchDbo = CapwatchDbo.GetInstance();
+    public StoreRepository(string connectionString) {
+      var capWatchDbo = CapwatchDbo.GetInstance(connectionString);
       _storesCol = capWatchDbo.GetStoreCollection();
     }
 
