@@ -1,7 +1,12 @@
-﻿using CapWatchBackend.Application.Repositories;
+﻿using AutoMapper;
+using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.Domain.Entities;
+using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
@@ -9,37 +14,42 @@ namespace CapWatchBackend.WebApi.Controllers {
   public class StoresController : ControllerBase {
     private readonly ILogger<StoresController> _logger;
     private readonly IStoreRepository _repository;
+    private readonly IMapper _mapper;
 
-    public StoresController(ILogger<StoresController> logger, IStoreRepository repository) {
+    public StoresController(ILogger<StoresController> logger, IStoreRepository repository, IMapper mapper) {
       _logger = logger;
       _repository = repository;
+      _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult GetStores()
     {
-      //List<StoreModel> stores = new List<StoreModel>();
-      // return Ok(stores);
-      return Ok(new StoreModel(new Domain.Entities.Store() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", CurrentCapacity = 135, MaxCapacity = 201 }));
+      var stores = _repository.GetStores().Select(store => new StoreModel(store));
+      return Ok(stores);
     } 
 
     [HttpGet("{id}")]
     public IActionResult GetStores(int id) {
-      // var stores = _repository.GetStores().Where(s => s.Id == id).Select(store => new StoreModel(store));
-      // return Ok(stores);
-      return Ok("Store 1");
+      var store = new StoreModel(_repository.GetStore(id));
+      return Ok(store);
     }
 
-    [HttpPut("{id}")]
-    public IActionResult PutStores(int id, StoreModel store) {
-
-      return NoContent();
+    [HttpPatch]
+    public async Task<IActionResult> UpdateStoresAsync(StoreModel model) {
+      var store = _mapper.Map<Store>(model);
+      // if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret))
+      //  return Forbid();
+      await _repository.UpdateStoreAsync(store);
+      return Ok();
     }
 
     [HttpPost]
-    public IActionResult PostStores(StoreModel store) {
-
-      return Ok(store);
+    public async Task<IActionResult> PostStoresAsync(StoreModel model) {
+      var store = _mapper.Map<Store>(model);
+      store.Secret = Guid.NewGuid();
+      await _repository.AddStoreAsync(store);
+      return Ok();
     }
   }
 }

@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using AutoMapper;
+using CapWatchBackend.WebApi.Mapper;
 
 namespace CapWatchBackend.WebApi {
   public class Startup {
@@ -29,6 +31,8 @@ namespace CapWatchBackend.WebApi {
       RegisterDependencies(services);
 
       services.AddControllers();
+
+      services.AddAutoMapper(typeof(MapperProfile));
 
       services.AddSwaggerGen(c => {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });

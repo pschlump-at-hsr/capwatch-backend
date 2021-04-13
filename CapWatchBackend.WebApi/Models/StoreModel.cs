@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreModel {
+    public StoreModel() { }
     public StoreModel(Store store) {
       Id = store.Id;
       Name = store.Name;
