@@ -1,5 +1,4 @@
 ﻿using CapWatchBackend.Application.Repositories;
-using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Linq;
@@ -19,7 +18,7 @@ namespace CapWatchBackend.WebApi.Controllers {
     [HttpGet]
     public IActionResult GetStores()
     {
-      // var stores = _repository.GetStores().Select(store => new StoreModel(store));
+      //List<StoreModel> stores = new List<StoreModel>();
       // return Ok(stores);
       return Ok(new StoreModel(new Domain.Entities.Store() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", CurrentCapacity = 135, MaxCapacity = 201 }));
     } 

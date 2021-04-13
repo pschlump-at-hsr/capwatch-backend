@@ -26,7 +26,6 @@ namespace CapWatchBackend.WebApi {
           .AllowAnyMethod();
         });
       });
-
       RegisterDependencies(services);
 
       services.AddControllers();
@@ -60,6 +59,7 @@ namespace CapWatchBackend.WebApi {
 
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
+      services.Configure<ConfigureDatabase>(Configuration.GetSection(nameof(ConfigureDatabase)));
     }
   }
 }
