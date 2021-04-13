@@ -19,7 +19,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
         _database = _client.GetDatabase("capwatchDB");
         SetupDatabaseMapping();
       } catch (MongoClientException e) {
-        throw new DatabaseException(e.Message, e.InnerException);
+        throw new RepositoryException(e.Message, e);
       }
     }
 
@@ -51,7 +51,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       try {
         return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
       } catch (MongoClientException e) {
-        throw new DatabaseException(e.Message, e.InnerException);
+        throw new RepositoryException(e.Message, e);
       }
     }
   }
