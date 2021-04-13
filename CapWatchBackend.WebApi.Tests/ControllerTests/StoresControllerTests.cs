@@ -30,9 +30,17 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     public async void TestGetStores() {
       HttpResponseMessage response = await _client.GetAsync("stores");
       var result = await response.Content.ReadAsStringAsync();
-      result.Should().Contain("Migros St. Gallen");
-      result.Should().Contain("Säntispark Bäder");
-      result.Should().Contain("Interdiscount");
+      result.Should().Contain("Ikea");
+      result.Should().Contain("Zoo Zürich");
+      result.Should().Contain("Polenmuseum - Schloss Rapperswil");
+      result.Should().NotContain("Botanischer Garten der Universität Bern");
+    }
+
+    [Fact]
+    public async void TestGetStoreById() {
+      HttpResponseMessage response = await _client.GetAsync("stores/id=1");
+      var result = await response.Content.ReadAsStringAsync();
+      result.Should().Contain("Ikea");
     }
   }
 }

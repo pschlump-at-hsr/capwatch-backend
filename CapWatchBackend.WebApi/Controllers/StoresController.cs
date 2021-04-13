@@ -2,32 +2,45 @@
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+using System.Linq;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
   [Route("[controller]")]
   public class StoresController : ControllerBase {
-    // todo 2021.04.08 Christoph: reactivate Repository
     private readonly ILogger<StoresController> _logger;
-    // private readonly IStoreRepository _repository;
+    private readonly IStoreRepository _repository;
 
     public StoresController(ILogger<StoresController> logger, IStoreRepository repository) {
       _logger = logger;
-      // _repository = repository;
+      _repository = repository;
     }
 
     [HttpGet]
-    public IActionResult GetStores() {
+    public IActionResult GetStores()
+    {
       // var stores = _repository.GetStores().Select(store => new StoreModel(store));
-      List<StoreModel> stores = new List<StoreModel>();
-      stores.Add(new StoreModel(new Domain.Entities.Store { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", CurrentCapacity = 135, MaxCapacity = 201 }));
-      stores.Add(new StoreModel(new Domain.Entities.Store { Id = 2, Name = "Zoo Zürich", Street = "Zürichbergstrasse 221", ZipCode = "8044", City = "Zürich", CurrentCapacity = 487, MaxCapacity = 1125 }));
-      stores.Add(new StoreModel(new Domain.Entities.Store { Id = 3, Name = "Polenmuseum - Schloss Rapperswil", Street = "Schloss", ZipCode = "8640", City = "Raperswil-Jona", CurrentCapacity = 11, MaxCapacity = 62 }));
-      stores.Add(new StoreModel(new Domain.Entities.Store { Id = 4, Name = "Alpamare", Street = "Gwattstrasse 12", ZipCode = "8808", City = "Pfäffikon", CurrentCapacity = 152, MaxCapacity = 612 }));
-      stores.Add(new StoreModel(new Domain.Entities.Store { Id = 5, Name = "Botanischer Garten der Universität Bern", Street = "Altenbergrain 21", ZipCode = "3013", City = "Bern", CurrentCapacity = 103, MaxCapacity = 103 }));
-      return Ok(stores);
+      // return Ok(stores);
+      return Ok(new StoreModel(new Domain.Entities.Store() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", CurrentCapacity = 135, MaxCapacity = 201 }));
+    } 
+
+    [HttpGet("{id}")]
+    public IActionResult GetStores(int id) {
+      // var stores = _repository.GetStores().Where(s => s.Id == id).Select(store => new StoreModel(store));
+      // return Ok(stores);
+      return Ok("Store 1");
     }
 
+    [HttpPut("{id}")]
+    public IActionResult PutStores(int id, StoreModel store) {
+
+      return NoContent();
+    }
+
+    [HttpPost]
+    public IActionResult PostStores(StoreModel store) {
+
+      return Ok(store);
+    }
   }
 }

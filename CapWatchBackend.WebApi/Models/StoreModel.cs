@@ -1,5 +1,6 @@
 ﻿using CapWatchBackend.Domain.Entities;
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreModel {
@@ -15,11 +16,14 @@ namespace CapWatchBackend.WebApi.Models {
     }
 
     public int Id { get; set; }
+    [Required]
     public string Name { get; set; }
     public string Street { get; set; }
     public string ZipCode { get; set; }
     public string City { get; set; }
+    [Range(0,Int32.MaxValue)]
     public int MaxCapacity { get; set; }
+    [Range(0, Int32.MaxValue)]
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
     public String Secret { get; set; }
