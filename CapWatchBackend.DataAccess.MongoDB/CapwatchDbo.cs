@@ -1,4 +1,5 @@
-﻿using CapWatchBackend.Domain.Entities;
+﻿using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.Domain.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -18,7 +19,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
         _database = _client.GetDatabase("capwatchDB");
         SetupDatabaseMapping();
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
 
@@ -29,6 +30,8 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       }
       return _instance;
     }
+
+
     private void SetupDatabaseMapping() {
       BsonClassMap.RegisterClassMap<Store>(
        map => {
@@ -48,7 +51,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       try {
         return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
   }

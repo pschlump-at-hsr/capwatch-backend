@@ -13,11 +13,13 @@ using System.Threading.Tasks;
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class StoreRepository : IStoreRepository {
     private IMongoCollection<Store> _storesCol;
-    private readonly ConfigureDatabase _configureDatabase;
     public StoreRepository(IOptions<ConfigureDatabase> options) {
-      _configureDatabase = options.Value;
-      var capWatchDbo = CapwatchDbo.GetInstance(_configureDatabase.ConnectionString);
-      _storesCol = capWatchDbo.GetStoreCollection();
+      try {
+        var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
+        _storesCol = capWatchDbo.GetStoreCollection();
+      } catch (DatabaseException e) {
+        DbLogger.Log(e.Message);
+      }
     }
 
     public StoreRepository(string connectionString) {
@@ -29,7 +31,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       try {
         return _storesCol.InsertOneAsync(store);
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
 
@@ -37,7 +39,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       try {
         return _storesCol.InsertManyAsync(stores);
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
 
@@ -45,7 +47,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       try {
         return _storesCol.ReplaceOneAsync(filter: new BsonDocument("storeId", store.Id), replacement: store);
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
 
@@ -57,28 +59,48 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
         }
         return Task.WhenAll(tasks.ToArray());
       } catch (MongoClientException e) {
-        throw e;
+        throw new DatabaseException(e.Message, e.InnerException);
       }
     }
 
-    public IEnumerable<Domain.Entities.Store> GetStores() {
-      return _storesCol.AsQueryable().OrderByDescending(x => x.Id).DistinctBy(x => x.Id);
+    public IEnumerable<Store> GetStores() {
+      try {
+        return _storesCol.AsQueryable().OrderByDescending(x => x.Id).DistinctBy(x => x.Id);
+      } catch (MongoClientException e) {
+        throw new DatabaseException(e.Message, e.InnerException);
+      }
     }
 
-    public IEnumerable<Domain.Entities.Store> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, OrderByDirection orderBy) {
-      return _storesCol.AsQueryable().Where(filter).OrderBy(ordering, orderBy);
+    public IEnumerable<Store> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, OrderByDirection orderBy) {
+      try {
+        return _storesCol.AsQueryable().Where(filter).OrderBy(ordering, orderBy);
+      } catch (MongoClientException e) {
+        throw new DatabaseException(e.Message, e.InnerException);
+      }
     }
 
     public Store GetStore(int id) {
-      return _storesCol.AsQueryable().Where(x => x.Id == id).SingleOrDefault();
+      try {
+        return _storesCol.AsQueryable().Where(x => x.Id == id).SingleOrDefault();
+      } catch (MongoClientException e) {
+        throw new DatabaseException(e.Message, e.InnerException);
+      }
     }
 
     public async void DeleteAllStores() {
-      await _storesCol.DeleteManyAsync(FilterDefinition<Store>.Empty);
+      try {
+        await _storesCol.DeleteManyAsync(FilterDefinition<Store>.Empty);
+      } catch (MongoClientException e) {
+        throw new DatabaseException(e.Message, e.InnerException);
+      }
     }
 
     public async void DeleteStore(Store store) {
-      await _storesCol.DeleteManyAsync(new BsonDocument("storeId", store.Id));
+      try {
+        await _storesCol.DeleteManyAsync(new BsonDocument("storeId", store.Id));
+      } catch (MongoClientException e) {
+        throw new DatabaseException(e.Message, e.InnerException);
+      }
     }
 
   }
