@@ -27,14 +27,14 @@ before_script:
 Build:
   stage: build
   script:
-    - docker pull $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG || true
+    - docker pull $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG || true
     # The built image is tagged locally with the commit SHA
     - >
       docker build
       --pull
       --build-arg VCS_REF=$CI_COMMIT_SHA
       --build-arg VCS_URL=$CI_PROJECT_URL
-      --cache-from $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
+      --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
@@ -50,7 +50,7 @@ Test:
 Tag develop:
   stage: tag-develop
   variables:
-    GIT_STRATEGY: fetch
+    GIT_STRATEGY: none
   only:
     - develop
   script:
@@ -62,8 +62,7 @@ Tag develop:
 Tag master:
   stage: tag-master
   variables:
-    # Again, we do not need the source code here. Just playing with Docker.
-    GIT_STRATEGY: fetch
+    GIT_STRATEGY: none
   only: ['tags', 'master']
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
