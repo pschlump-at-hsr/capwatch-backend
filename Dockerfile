@@ -24,4 +24,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0
 
 COPY --from=build-env /app/out .
 
-#ENTRYPOINT ["dotnet", "CapWatchBackend.WebApi.dll"]
+ENTRYPOINT ["dotnet", "CapWatchBackend.WebApi.dll"]
