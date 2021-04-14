@@ -1,7 +1,7 @@
 variables:
   DOCKER_IMAGE_DOCKER: docker:stable-dind
   SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
-  # Sonarqube token is defined as a GitLab global variable
+  # Sonarqube token is defined as a GitLab global variable ($SONARQUBE_TOKEN)
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
   TEST_DIR: "CapWatchBackend.WebApi.Tests"
