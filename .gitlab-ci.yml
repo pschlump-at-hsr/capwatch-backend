@@ -42,7 +42,7 @@ Build:
 Test:
   stage: test
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  only: ['merge_requests', 'develop', 'master']
+#  only: ['merge_requests', 'develop', 'master']
   script:
     - "cd $TEST_DIR"
     - "dotnet test"
