@@ -41,8 +41,10 @@ Build:
 
 Test:
   stage: test
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-#  only: ['merge_requests', 'develop', 'master']
+  image:
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    entrypoint: ["/bin/sh", "-c"]
+  #  only: ['merge_requests', 'develop', 'master']
   script:
     - "cd $TEST_DIR"
     - "dotnet test"
@@ -63,7 +65,7 @@ Tag master:
   stage: tag-master
   variables:
     GIT_STRATEGY: none
-  only: ['tags', 'master']
+  only: [ 'tags', 'master' ]
   script:
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     # Tag it with the latest tag
