@@ -1,4 +1,5 @@
 ﻿using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.Domain.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -42,7 +43,8 @@ namespace CapWatchBackend.DataAccess.MongoDB {
          map.MapProperty(x => x.Logo).SetElementName("logo");
          map.MapProperty(x => x.Secret).SetElementName("secret")
          .SetSerializer(new GuidSerializer(BsonType.String));
-         map.MapProperty(x => x.Id).SetElementName("storeId");
+         map.MapProperty(x => x.Id).SetElementName("_id")
+         .SetIdGenerator(IntIdGenerator.Instance);
          map.MapProperty(x => x.CurrentCapacity).SetElementName("currentCapacity");
          map.MapProperty(x => x.MaxCapacity).SetElementName("maxCapacity");
        });
