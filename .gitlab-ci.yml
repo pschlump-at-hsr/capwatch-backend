@@ -1,88 +1,89 @@
-image: docker:19
+variables:
+  DOCKER_IMAGE_DOCKER: docker:stable-dind
+  SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
+  # Sonarqube token is defined as a GitLab global variable
+  NAME_LATEST_TAG: latest
+  NAME_DEVELOP_TAG: develop
+  TEST_DIR: "CapWatchBackend.WebApi.Tests"
+
+image: $DOCKER_IMAGE_DOCKER
 
 stages:
   - build
-  - push
+  - test
+  - tag-develop
+  - tag-master
+  - deploy-develop
+  - deploy-master
 
-# Use this if your GitLab runner does not use socket binding
 services:
-   - docker:dind
+  - docker:dind
 
 before_script:
-  # docker login asks for the password to be passed through stdin for security
-  # we use $CI_JOB_TOKEN here which is a special token provided by GitLab
+  # $CI_JOB_TOKEN, a special token provided by GitLab
   - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
 
+# Build image for every commit
 Build:
-  # build image for every commit
   stage: build
   script:
-    # fetches the latest image (not failing if image is not found)
-    - docker pull $CI_REGISTRY_IMAGE:latest || true
-    # builds the project, passing proxy variables, and vcs vars for LABEL
-    # notice the cache-from, which is going to use the image we just pulled locally
-    # the built image is tagged locally with the commit SHA.
+    - docker pull $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG || true
+    # The built image is tagged locally with the commit SHA
     - >
       docker build
       --pull
       --build-arg VCS_REF=$CI_COMMIT_SHA
       --build-arg VCS_URL=$CI_PROJECT_URL
-      --cache-from $CI_REGISTRY_IMAGE:latest
+      --cache-from $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
-
-
-# Here, the goal is to tag the "master" branch as "latest"
-Push latest:
-  variables:
-    # We are just playing with Docker here. 
-    # We do not need GitLab to clone the source code.
-    GIT_STRATEGY: none
-  stage: push
-  only:
-    # Only "master" should be tagged "latest"
-    - master
+Test:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  only: ['merge_requests', 'develop', 'master']
   script:
-    # Because we have no guarantee that this job will be picked up by the same runner 
-    # that built the image in the previous step, we pull it again locally
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    # Then we tag it "latest"
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:latest
-    # Annnd we push it.
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - "cd $TEST_DIR"
+    - "dotnet test"
 
-# Here, the goal is to tag the "develop" branch as "develop"
-Push develop:
+Tag develop:
+  stage: tag-develop
   variables:
-    # We are just playing with Docker here. 
-    # We do not need GitLab to clone the source code.
-    GIT_STRATEGY: none
-  stage: push
+    GIT_STRATEGY: fetch
   only:
-    # Only "develop" should be tagged "develop"
     - develop
   script:
-    # Because we have no guarantee that this job will be picked up by the same runner 
-    # that built the image in the previous step, we pull it again locally
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    # Then we tag it "develop"
-    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:develop
-    # Annnd we push it.
-    - docker push $CI_REGISTRY_IMAGE:develop
+    # Tag it "develop"
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+    - docker push $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
 
-# Finally, the goal here is to Docker tag any Git tag
-# GitLab will start a new pipeline everytime a Git tag is created, which is pretty awesome
-#Push tag:
-#  variables:
+Tag master:
+  stage: tag-master
+  variables:
     # Again, we do not need the source code here. Just playing with Docker.
-#    GIT_STRATEGY: none
-#  stage: push
-#  only:
-    # We want this job to be run on tags only.
-#    - tags
-#  script:
-#    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-#    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
-#    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    GIT_STRATEGY: fetch
+  only: ['tags', 'master']
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    # Tag it with the latest tag
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    # Tag it latest for the latest master commit
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
+    - docker push $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
+
+Deploy develop:
+  stage: deploy-develop
+  only:
+    - develop
+  script:
+    - echo "Hello from develop deployment"
+
+Deploy master:
+  stage: deploy-master
+  only:
+    - master
+  script:
+    - echo "Hello from master deployment"
