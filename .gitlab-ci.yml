@@ -43,7 +43,7 @@ Test:
   stage: test
   image:
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    entrypoint: ["/bin/sh", "-c"]
+    entrypoint: ["/bin/dash", "-c"]
   #  only: ['merge_requests', 'develop', 'master']
   script:
     - "cd $TEST_DIR"
