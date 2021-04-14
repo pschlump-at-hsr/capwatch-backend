@@ -15,9 +15,16 @@ Code autoformatting and import organizer when file saved
 
 Extensions -> Manage Extensions -> Search *Power Commands for Visual Studio* -> Install -> restart Visual Studio
 
+MongoDB Tools -> Manage Extensions -> Search MongoDB Tools -> Install
+
+![Server Connection Properties](.\CapWatchBackend.DataAccess.MongoDB\images\Server_Connection_Properties.png)
+
+Password is capwusr123
+
 # Build and run Docker Container
 
 ```
 cd /path/to/capwatch-backend
 docker-compose up -d
 ```
+

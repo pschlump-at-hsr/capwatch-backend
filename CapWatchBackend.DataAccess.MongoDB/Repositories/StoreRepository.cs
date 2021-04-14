@@ -25,39 +25,49 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
     public StoreRepository(string connectionString) {
       var capWatchDbo = CapwatchDbo.GetInstance(connectionString);
       _storesCol = capWatchDbo.GetStoreCollection();
+      var maxId = _storesCol.AsQueryable().Max(x => x.Id);
+      IntIdGenerator.Instance.GenerateId(null, maxId);
     }
 
-    public Task AddStoreAsync(Store store) {
+    public Store AddStore(Store store) {
       try {
-        return _storesCol.InsertOneAsync(store);
+        store.Id = (int)IntIdGenerator.Instance.GenerateId(_storesCol, 0);
+        _storesCol.InsertOne(store);
+        return store;
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public Task AddStoresAsync(IEnumerable<Store> stores) {
+    public IEnumerable<Store> AddStores(IEnumerable<Store> stores) {
       try {
-        return _storesCol.InsertManyAsync(stores);
+        foreach (var store in stores) {
+          store.Id = (int)IntIdGenerator.Instance.GenerateId(_storesCol, 0);
+        }
+        _storesCol.InsertMany(stores);
+        return stores;
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public Task UpdateStoreAsync(Store store) {
+    public Store UpdateStore(Store store) {
       try {
-        return _storesCol.ReplaceOneAsync(filter: new BsonDocument("storeId", store.Id), replacement: store);
+        _storesCol.ReplaceOne(filter: new BsonDocument("_id", store.Id), replacement: store);
+        return store;
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public Task UpdateStoresAsync(IEnumerable<Store> stores) {
+    public IEnumerable<Store> UpdateStores(IEnumerable<Store> stores) {
       List<Task> tasks = new List<Task>();
       try {
         foreach (var store in stores) {
-          tasks.Add(_storesCol.ReplaceOneAsync(filter: new BsonDocument("storeId", store.Id), replacement: store));
+          tasks.Add(_storesCol.ReplaceOneAsync(filter: new BsonDocument("_id", store.Id), replacement: store));
         }
-        return Task.WhenAll(tasks.ToArray());
+        Task.WhenAll(tasks.ToArray()).Wait();
+        return stores;
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
@@ -65,15 +75,15 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
 
     public IEnumerable<Store> GetStores() {
       try {
-        return _storesCol.AsQueryable().OrderByDescending(x => x.Id).DistinctBy(x => x.Id);
+        return _storesCol.Find(FilterDefinition<Store>.Empty).ToList();
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public IEnumerable<Store> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, OrderByDirection orderBy) {
+    public IEnumerable<Store> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy) {
       try {
-        return _storesCol.AsQueryable().Where(filter).OrderBy(ordering, orderBy);
+        return _storesCol.AsQueryable().Where(filter).OrderBy(ordering, (OrderByDirection)orderBy);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
