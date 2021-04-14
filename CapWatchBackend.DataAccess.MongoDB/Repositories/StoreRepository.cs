@@ -17,6 +17,8 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
+        var maxId = _storesCol.AsQueryable().Max(x => x.Id);
+        IntIdGenerator.Instance.GenerateId(null, maxId);
       } catch (RepositoryException e) {
         DbLogger.Log(e.Message);
       }

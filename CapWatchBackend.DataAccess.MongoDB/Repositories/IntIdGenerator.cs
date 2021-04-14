@@ -4,19 +4,19 @@ using System.Threading;
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class IntIdGenerator : IIdGenerator {
 
-    private static readonly IntIdGenerator __instance = new IntIdGenerator();
-    private static int __increment;
+    private static readonly IntIdGenerator _instance = new IntIdGenerator();
+    private static int _increment;
     static IntIdGenerator() { }
 
     public static IntIdGenerator Instance {
-      get { return __instance; }
+      get { return _instance; }
     }
 
     public object GenerateId(object container, object offset) {
-      if ((int)offset > __increment) {
-        __increment = (int)offset;
+      if ((int)offset > _increment) {
+        _increment = (int)offset;
       }
-      return Interlocked.Increment(ref __increment);
+      return Interlocked.Increment(ref _increment);
     }
 
     public bool IsEmpty(object id) {
