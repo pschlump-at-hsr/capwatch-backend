@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("CapWatchBackend.WebApi")]
+[assembly: InternalsVisibleTo("CapWatchBackend.Application.Tests")]
 namespace CapWatchBackend.Application.Handlers {
   internal class StoreHandler : IStoreHandler {
     private readonly IStoreRepository _repository;
