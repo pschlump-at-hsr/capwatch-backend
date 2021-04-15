@@ -10,6 +10,7 @@ COPY CapWatchBackend.Domain/*.csproj ./CapWatchBackend.Domain/
 COPY CapWatchBackend.WebApi/*.csproj ./CapWatchBackend.WebApi/
 COPY CapWatchBackend.WebApi.Tests/*.csproj ./CapWatchBackend.WebApi.Tests/
 COPY CapWatchBackend.DataAccess.MongoDB.Tests/*.csproj ./CapWatchBackend.DataAccess.MongoDB.Tests/
+COPY CapWatchBackend.Application.Tests/*.csproj ./CapWatchBackend.Application.Tests/
 
 RUN dotnet restore
 
