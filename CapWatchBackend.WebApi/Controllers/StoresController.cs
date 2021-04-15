@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
@@ -23,8 +22,7 @@ namespace CapWatchBackend.WebApi.Controllers {
     }
 
     [HttpGet]
-    public IActionResult GetStores()
-    {
+    public IActionResult GetStores() {
       var stores = _repository.GetStores().Select(store => new StoreModel(store));
       return Ok(stores);
     }
@@ -36,19 +34,19 @@ namespace CapWatchBackend.WebApi.Controllers {
     }
 
     [HttpPatch]
-    public async Task<IActionResult> UpdateStoresAsync(StoreModel model) {
+    public IActionResult UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
       // if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret))
       //  return Forbid();
-      await _repository.UpdateStoreAsync(store);
+      store = _repository.UpdateStore(store);
       return Ok();
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostStoresAsync(StoreModel model) {
+    public IActionResult PostStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
       store.Secret = Guid.NewGuid();
-      await _repository.AddStoreAsync(store);
+      store = _repository.AddStore(store);
       return Ok();
     }
   }
