@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.WebApi.Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CapWatchBackend.DataAccess.MongoDB.Tests", "CapWatchBackend.DataAccess.MongoDB.Tests\CapWatchBackend.DataAccess.MongoDB.Tests.csproj", "{8C7B43D2-DE2B-421C-B68D-D79ECAC55D6E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapWatchBackend.ApplicationTests", "CapWatchBackend.ApplicationTests\CapWatchBackend.ApplicationTests.csproj", "{12A6F84D-2BD9-4BCE-8D6A-1314883A4D15}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CapWatchBackend.Application.Tests", "CapWatchBackend.Application.Tests\CapWatchBackend.Application.Tests.csproj", "{12A6F84D-2BD9-4BCE-8D6A-1314883A4D15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
