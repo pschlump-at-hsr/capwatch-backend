@@ -17,8 +17,10 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
-        var maxId = _storesCol.AsQueryable().Max(x => x.Id);
-        IntIdGenerator.Instance.GenerateId(null, maxId);
+        if (_storesCol.AsQueryable().Count() > 0) {
+          var maxId = _storesCol.AsQueryable().Max(x => x.Id);
+          IntIdGenerator.Instance.GenerateId(null, maxId);
+        }
       } catch (RepositoryException e) {
         DbLogger.Log(e.Message);
       }
@@ -27,8 +29,10 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
     public StoreRepository(string connectionString) {
       var capWatchDbo = CapwatchDbo.GetInstance(connectionString);
       _storesCol = capWatchDbo.GetStoreCollection();
-      var maxId = _storesCol.AsQueryable().Max(x => x.Id);
-      IntIdGenerator.Instance.GenerateId(null, maxId);
+      if (_storesCol.AsQueryable().Count() > 0) {
+        var maxId = _storesCol.AsQueryable().Max(x => x.Id);
+        IntIdGenerator.Instance.GenerateId(null, maxId);
+      }
     }
 
     public Store AddStore(Store store) {
