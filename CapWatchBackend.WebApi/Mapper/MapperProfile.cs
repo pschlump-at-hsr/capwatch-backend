@@ -13,6 +13,9 @@ namespace CapWatchBackend.WebApi.Mapper {
       CreateMap<StoreModel, Store>()
         .ForMember(dest => dest.Secret, map => map.MapFrom(src => Guid.Parse(src.Secret)))
         .ReverseMap();
+      CreateMap<StoreOverview, Store>().ReverseMap();
+      CreateMap<StoreNew, Store>().ReverseMap();
+      CreateMap<StoreNewResponse, Store>().ReverseMap();
     }
   }
 }
