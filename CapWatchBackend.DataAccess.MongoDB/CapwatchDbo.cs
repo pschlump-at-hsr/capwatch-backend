@@ -1,4 +1,4 @@
-﻿using CapWatchBackend.Application.Repositories;
+﻿using CapWatchBackend.Application.Repositories.Exceptions;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.Domain.Entities;
 using MongoDB.Bson;

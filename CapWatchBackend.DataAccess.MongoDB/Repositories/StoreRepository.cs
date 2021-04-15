@@ -1,4 +1,5 @@
 ﻿using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.Application.Repositories.Exceptions;
 using CapWatchBackend.Domain.Entities;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
