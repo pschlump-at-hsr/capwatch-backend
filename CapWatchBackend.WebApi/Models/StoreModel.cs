@@ -22,7 +22,7 @@ namespace CapWatchBackend.WebApi.Models {
     public string Street { get; set; }
     public string ZipCode { get; set; }
     public string City { get; set; }
-    [Range(0,Int32.MaxValue)]
+    [Range(0, Int32.MaxValue)]
     public int MaxCapacity { get; set; }
     [Range(0, Int32.MaxValue)]
     public int CurrentCapacity { get; set; }

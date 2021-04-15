@@ -1,53 +1,49 @@
 ﻿using AutoMapper;
-using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Linq;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
   [Route("[controller]")]
   public class StoresController : ControllerBase {
-    private readonly ILogger<StoresController> _logger;
-    private readonly IStoreRepository _repository;
+    private readonly IStoreHandler _handler;
     private readonly IMapper _mapper;
 
-    public StoresController(ILogger<StoresController> logger, IStoreRepository repository, IMapper mapper) {
-      _logger = logger;
-      _repository = repository;
+    public StoresController(ILogger<StoresController> logger, IStoreHandler handler, IMapper mapper) {
+      _handler = handler;
       _mapper = mapper;
     }
 
     [HttpGet]
     public IActionResult GetStores() {
-      var stores = _repository.GetStores().Select(store => new StoreModel(store));
-      return Ok(stores);
+      var stores = _handler.GetStores();
+      var result = stores.Select(store => new StoreModel(store));
+      return Ok(result);
     }
 
     [HttpGet("{id}")]
     public IActionResult GetStores(int id) {
-      var store = new StoreModel(_repository.GetStore(id));
-      return Ok(store);
+      var store = _handler.GetStore(id);
+      var result = new StoreModel(store);
+      return Ok(result);
     }
 
     [HttpPatch]
     public IActionResult UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
-      // if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret))
-      //  return Forbid();
-      store = _repository.UpdateStore(store);
+      _handler.UpdateStore(store);
       return Ok();
     }
 
     [HttpPost]
     public IActionResult PostStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
-      store.Secret = Guid.NewGuid();
-      store = _repository.AddStore(store);
-      return Ok();
+      _handler.AddStore(store);
+      return Ok(store.Secret);
     }
   }
 }
