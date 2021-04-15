@@ -1,12 +1,10 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using CapWatchBackend.Application.Exceptions;
+using System;
 
-namespace CapWatchBackend.Application.Repositories {
+namespace CapWatchBackend.Application.Repositories.Exceptions {
   [Serializable]
-  public class RepositoryException : ApplicationException {
-    public RepositoryException() { }
-    public RepositoryException(string message) : base(message) { }
-    public RepositoryException(string message, Exception innerException) : base(message, innerException) { }
-    protected RepositoryException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+  public class RepositoryException : ExceptionBase {
+    public RepositoryException(string message, Exception innerException)
+      : base(message, innerException) { }
   }
 }
