@@ -46,6 +46,5 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       sm.UpdateStoreAsync(store).Wait();
       sm.GetStore(5).Name.Should().Be("Botanischer Garten St. Gallen");
     }
-
   }
 }

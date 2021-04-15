@@ -38,7 +38,7 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
 
     [Fact]
     public async void TestGetStoreById() {
-      HttpResponseMessage response = await _client.GetAsync("stores/id=1");
+      HttpResponseMessage response = await _client.GetAsync("stores/1");
       var result = await response.Content.ReadAsStringAsync();
       result.Should().Contain("Ikea");
     }

@@ -27,7 +27,7 @@ namespace CapWatchBackend.WebApi.Controllers {
     {
       var stores = _repository.GetStores().Select(store => new StoreModel(store));
       return Ok(stores);
-    } 
+    }
 
     [HttpGet("{id}")]
     public IActionResult GetStores(int id) {
