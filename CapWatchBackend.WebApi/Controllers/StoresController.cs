@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CapWatchBackend.Application.Exceptions;
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
@@ -21,7 +22,7 @@ namespace CapWatchBackend.WebApi.Controllers {
       _mapper = mapper;
     }
 
-    // todo Christoph 2021.04.15: Korrekte Type implementation
+    // todo Christoph 2021.04.15: Implement Type in Backend (Pseudodata for Frontend)
     [HttpGet]
     public IActionResult GetStores() {
       var stores = _handler.GetStores();
@@ -39,16 +40,20 @@ namespace CapWatchBackend.WebApi.Controllers {
     public IActionResult GetStores(int id) {
       var store = _handler.GetStore(id);
       var result = _mapper.Map<StoreOverview>(store);
+      var type = new StoreType() { Description = "Detailhandel" };
+      result.Type = type;
       return Ok(result);
     }
 
-    // todo Christoph 2021.04.15: Besseres Errorhandling
+    // todo Christoph 2021.04.15: Improve Errorhandling
     [HttpPatch]
     public IActionResult UpdateStores(StoreModel model) {
       try {
         var store = _mapper.Map<Store>(model);
         _handler.UpdateStore(store);
         return Ok();
+      } catch (SecretInvalidException e) {
+        return new StatusCodeResult(e.Status);
       } catch (Exception) {
         return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
       }

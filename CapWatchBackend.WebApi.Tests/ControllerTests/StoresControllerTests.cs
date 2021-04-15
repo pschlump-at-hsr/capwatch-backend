@@ -197,7 +197,7 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
       await response.Content.ReadAsStringAsync();
-      response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
+      response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
   }
 }
