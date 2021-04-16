@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
-using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Mapper;
 using CapWatchBackend.WebApi.Models;
 using FluentAssertions;
-using System;
-using System.Diagnostics;
 using System.Text;
 using Xunit;
 
 namespace CapWatchBackend.WebApi.Tests.ModelTests {
   public class StoreModelTests {
+
+    private readonly IMapper _mapper;
+
+    public StoreModelTests() {
+      _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())).CreateMapper();
+    }
 
     [Theory]
     [InlineData(1, "Ikea", "Zürcherstrasse 460", "9015", "St. Gallen", 135, 201, "Test")]
@@ -27,9 +30,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
         Logo = Encoding.UTF8.GetBytes(logo),
       };
 
-      // todo Mapper verwenden, wie? @Schneider
-      /*
-      IMapper mapper = new AutoMapper();
+      var model = _mapper.Map<StoreModel>(store);
 
       model.Id.Should().Be(id);
       model.Name.Should().Be(name);
@@ -39,7 +40,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
       model.MaxCapacity.Should().Be(maxCapacity);
       model.CurrentCapacity.Should().Be(currentCapacity);
       model.Logo.Should().BeEquivalentTo(Encoding.UTF8.GetBytes(logo));
-      */
+
     }
   }
 }
