@@ -1,4 +1,6 @@
-﻿using CapWatchBackend.Domain.Entities;
+﻿using AutoMapper;
+using CapWatchBackend.Domain.Entities;
+using CapWatchBackend.WebApi.Mapper;
 using CapWatchBackend.WebApi.Models;
 using FluentAssertions;
 using System;
@@ -14,7 +16,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
     [InlineData(2, "Zoo Zürich", "Zürichbergstrasse 221", "8044", "Zürich", 487, 1125, "asdf")]
     [InlineData(3, "Polenmuseum - Schloss Rapperswil", "Schloss", "8640", "Raperswil-Jona", 11, 62, "jkl")]
     public void TestConstructor(int id, string name, string street, string zipCode, string city, int maxCapacity, int currentCapacity, string logo) {
-      var store = new Store {
+      var store = new StoreModel {
         Id = id,
         Name = name,
         Street = street,
@@ -25,7 +27,9 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
         Logo = Encoding.UTF8.GetBytes(logo),
       };
 
-      var model = new StoreModel(store);
+      // todo Mapper verwenden, wie? @Schneider
+      /*
+      IMapper mapper = new AutoMapper();
 
       model.Id.Should().Be(id);
       model.Name.Should().Be(name);
@@ -35,6 +39,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
       model.MaxCapacity.Should().Be(maxCapacity);
       model.CurrentCapacity.Should().Be(currentCapacity);
       model.Logo.Should().BeEquivalentTo(Encoding.UTF8.GetBytes(logo));
+      */
     }
   }
 }

@@ -33,13 +33,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
     }
 
     public void UpdateStore(Store store) {
-      var internalStore = new Store { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", CurrentCapacity = 135, MaxCapacity = 201, Secret = Guid.Parse("9c9cee44-c839-48f2-b54e-236d95fe5d7f") };
-      if (store.Id != internalStore.Id) {
-        throw new KeyNotFoundException();
-      }
-      if (!store.Secret.Equals(internalStore.Secret)) {
-        throw new SecretInvalidException();
-      }
+      
     }
   }
 }

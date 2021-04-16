@@ -4,18 +4,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreModel {
-    public StoreModel() { }
-    public StoreModel(Store store) {
-      Id = store.Id;
-      Name = store.Name;
-      Street = store.Street;
-      ZipCode = store.ZipCode;
-      City = store.City;
-      MaxCapacity = store.MaxCapacity;
-      CurrentCapacity = store.CurrentCapacity;
-      Logo = store.Logo;
-    }
-
     [Required]
     public int Id { get; set; }
     [Required]

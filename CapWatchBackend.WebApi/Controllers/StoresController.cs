@@ -45,18 +45,11 @@ namespace CapWatchBackend.WebApi.Controllers {
       return Ok(result);
     }
 
-    // todo Christoph 2021.04.15: Improve Errorhandling
     [HttpPatch]
     public IActionResult UpdateStores(StoreModel model) {
-      try {
-        var store = _mapper.Map<Store>(model);
-        _handler.UpdateStore(store);
-        return Ok();
-      } catch (SecretInvalidException e) {
-        return new StatusCodeResult(e.Status);
-      } catch (Exception) {
-        return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-      }
+      var store = _mapper.Map<Store>(model);
+      _handler.UpdateStore(store);
+      return Ok();
     }
 
     [HttpPost]

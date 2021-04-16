@@ -126,16 +126,6 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreUnknownId() {
-      var newStore = new StoreModel() { Id = 2, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
-      var json = JsonConvert.SerializeObject(newStore);
-      var content = new StringContent(json, Encoding.UTF8, "application/json");
-      HttpResponseMessage response = await _client.PatchAsync("stores", content);
-      await response.Content.ReadAsStringAsync();
-      response.StatusCode.Should().Be(HttpStatusCode.InternalServerError);
-    }
-
-    [Fact]
     public async void TestUpdateStoreNoName() {
       var newStore = new StoreModel() { Id = 1, Name = null, Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
@@ -188,16 +178,6 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
       var result = await response.Content.ReadAsStringAsync();
       response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
       result.Should().Contain("The field MaxCapacity must be between 1 and 2147483647.");
-    }
-
-    [Fact]
-    public async void TestUpdateStoreInvalidSecret() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "636e3cdd-7cdf-44cb-8cd5-d24717a5b7e9" };
-      var json = JsonConvert.SerializeObject(newStore);
-      var content = new StringContent(json, Encoding.UTF8, "application/json");
-      HttpResponseMessage response = await _client.PatchAsync("stores", content);
-      await response.Content.ReadAsStringAsync();
-      response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
   }
 }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreOverview {
-    public StoreOverview() { }
     public int Id { get; set; }
     public string Name { get; set; }
     public string Street { get; set; }
