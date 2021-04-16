@@ -1,5 +1,8 @@
+using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
+using CapWatchBackend.WebApi.ActionFilter;
+using CapWatchBackend.WebApi.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +32,9 @@ namespace CapWatchBackend.WebApi {
 
       RegisterDependencies(services);
 
-      services.AddControllers();
+      services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
+
+      services.AddAutoMapper(typeof(MapperProfile));
 
       services.AddSwaggerGen(c => {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });
@@ -42,7 +47,6 @@ namespace CapWatchBackend.WebApi {
       app.UseCors(CorsOrigins);
 
       if (env.IsDevelopment()) {
-        app.UseDeveloperExceptionPage();
         app.UseSwagger();
         app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CapWatchBackend.WebApi v1"));
       }
@@ -60,6 +64,8 @@ namespace CapWatchBackend.WebApi {
 
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
+      services.AddSingleton<IStoreHandler, StoreHandler>();
+      services.Configure<ConfigureDatabase>(Configuration.GetSection(nameof(ConfigureDatabase)));
     }
   }
 }

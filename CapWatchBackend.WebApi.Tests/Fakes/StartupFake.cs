@@ -1,4 +1,4 @@
-﻿using CapWatchBackend.Application.Repositories;
+﻿using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.WebApi.Tests.Mocks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +10,7 @@ namespace CapWatchBackend.WebApi.Tests.Fakes {
     }
 
     protected override void RegisterDependencies(IServiceCollection services) {
-      services.AddSingleton<IStoreRepository, StoreRepositoryMock>();
+      services.AddSingleton<IStoreHandler, StoreHandlerMock>();
     }
   }
 }

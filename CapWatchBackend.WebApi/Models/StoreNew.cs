@@ -1,11 +1,13 @@
-﻿using CapWatchBackend.Domain.Entities;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
-  public class StoreModel {
-    [Required]
-    public int Id { get; set; }
+  public class StoreNew {
+
     [Required]
     public string Name { get; set; }
     [Required]
@@ -14,14 +16,8 @@ namespace CapWatchBackend.WebApi.Models {
     public string ZipCode { get; set; }
     [Required]
     public string City { get; set; }
-    [Required]
     [Range(1, int.MaxValue)]
-    public int MaxCapacity { get; set; }
-    [Required]
-    [Range(0, int.MaxValue)]
-    public int CurrentCapacity { get; set; }
+    public int? MaxCapacity { get; set; }
     public byte[] Logo { get; set; }
-    [Required]
-    public String Secret { get; set; }
   }
 }
