@@ -1,11 +1,13 @@
 ﻿using CapWatchBackend.Domain.Entities;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CapWatchBackend.Application.Handlers {
   public interface IStoreHandler {
-    void AddStore(Store store);
-    void UpdateStore(Store store);
+    Task AddStoreAsync(Store store);
+    Task UpdateStoreAsync(Store store);
     IEnumerable<Store> GetStores();
-    Store GetStore(int id);
+    Store GetStore(Guid id);
   }
 }

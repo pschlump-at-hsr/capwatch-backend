@@ -3,6 +3,7 @@ using CapWatchBackend.Application.Repositories.Exceptions;
 using CapWatchBackend.Domain.Entities;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Driver;
 using MoreLinq;
 using System;
@@ -13,15 +14,11 @@ using System.Threading.Tasks;
 
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class StoreRepository : IStoreRepository {
-    private IMongoCollection<Store> _storesCol;
+    private readonly IMongoCollection<Store> _storesCol;
     public StoreRepository(IOptions<ConfigureDatabase> options) {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
-        if (_storesCol.AsQueryable().Count() > 0) {
-          var maxId = _storesCol.AsQueryable().Max(x => x.Id);
-          IntIdGenerator.Instance.GenerateId(null, maxId);
-        }
       } catch (RepositoryException e) {
         DbLogger.Log(e.Message);
       }
@@ -30,51 +27,43 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
     public StoreRepository(string connectionString) {
       var capWatchDbo = CapwatchDbo.GetInstance(connectionString);
       _storesCol = capWatchDbo.GetStoreCollection();
-      if (_storesCol.AsQueryable().Count() > 0) {
-        var maxId = _storesCol.AsQueryable().Max(x => x.Id);
-        IntIdGenerator.Instance.GenerateId(null, maxId);
-      }
     }
 
-    public Store AddStore(Store store) {
+    public async Task AddStoreAsync(Store store) {
       try {
-        store.Id = (int)IntIdGenerator.Instance.GenerateId(_storesCol, 0);
-        _storesCol.InsertOne(store);
-        return store;
+        store.Id = (Guid)GuidGenerator.Instance.GenerateId(_storesCol, store);
+        await _storesCol.InsertOneAsync(store);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public IEnumerable<Store> AddStores(IEnumerable<Store> stores) {
+    public async Task AddStoresAsync(IEnumerable<Store> stores) {
       try {
         foreach (var store in stores) {
-          store.Id = (int)IntIdGenerator.Instance.GenerateId(_storesCol, 0);
+          store.Id = (Guid)GuidGenerator.Instance.GenerateId(_storesCol, store);
         }
-        _storesCol.InsertMany(stores);
-        return stores;
+        await _storesCol.InsertManyAsync(stores);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public Store UpdateStore(Store store) {
+    public async Task UpdateStoreAsync(Store store) {
       try {
-        _storesCol.ReplaceOne(filter: new BsonDocument("_id", store.Id), replacement: store);
-        return store;
+        await _storesCol.ReplaceOneAsync(filter: new BsonDocument("_id", new BsonBinaryData(store.Id, GuidRepresentation.Standard)), replacement: store);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public IEnumerable<Store> UpdateStores(IEnumerable<Store> stores) {
+    public async Task UpdateStoresAsync(IEnumerable<Store> stores) {
       List<Task> tasks = new List<Task>();
       try {
         foreach (var store in stores) {
-          tasks.Add(_storesCol.ReplaceOneAsync(filter: new BsonDocument("_id", store.Id), replacement: store));
+          tasks.Add(_storesCol.ReplaceOneAsync(filter: new BsonDocument("_id", new BsonBinaryData(store.Id, GuidRepresentation.Standard)), replacement: store));
         }
-        Task.WhenAll(tasks.ToArray()).Wait();
-        return stores;
+        await Task.WhenAll(tasks.ToArray());
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
@@ -96,9 +85,9 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Store GetStore(int id) {
+    public Store GetStore(Guid id) {
       try {
-        return _storesCol.AsQueryable().Where(x => x.Id == id).SingleOrDefault();
+        return _storesCol.AsQueryable().Where(x => x.Id == id).FirstOrDefault();
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
@@ -114,7 +103,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
 
     public async void DeleteStore(Store store) {
       try {
-        await _storesCol.DeleteManyAsync(new BsonDocument("storeId", store.Id));
+        await _storesCol.DeleteManyAsync(new BsonDocument("storeId", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }

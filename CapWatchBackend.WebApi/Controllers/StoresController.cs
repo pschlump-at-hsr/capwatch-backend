@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CapWatchBackend.Application.Exceptions;
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
@@ -8,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
@@ -37,7 +35,7 @@ namespace CapWatchBackend.WebApi.Controllers {
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetStores(int id) {
+    public IActionResult GetStores(Guid id) {
       var store = _handler.GetStore(id);
       var result = _mapper.Map<StoreOverview>(store);
       var type = new StoreType() { Description = "Detailhandel" };
@@ -48,14 +46,14 @@ namespace CapWatchBackend.WebApi.Controllers {
     [HttpPatch]
     public IActionResult UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
-      _handler.UpdateStore(store);
+      _handler.UpdateStoreAsync(store);
       return Ok();
     }
 
     [HttpPost]
     public IActionResult PostStores(StoreNew model) {
       var store = _mapper.Map<Store>(model);
-      _handler.AddStore(store);
+      _handler.AddStoreAsync(store).Wait();
       var result = _mapper.Map<StoreNewResponse>(store);
       return Ok(result);
     }

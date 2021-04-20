@@ -4,6 +4,7 @@ using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("CapWatchBackend.WebApi")]
 [assembly: InternalsVisibleTo("CapWatchBackend.Application.Tests")]
@@ -15,24 +16,24 @@ namespace CapWatchBackend.Application.Handlers {
       _repository = repository;
     }
 
-    public void AddStore(Store store) {
+    public async Task AddStoreAsync(Store store) {
       store.Secret = Guid.NewGuid();
-      _repository.AddStore(store);
+      await _repository.AddStoreAsync(store);
     }
 
-    public void UpdateStore(Store store) {
+    public async Task UpdateStoreAsync(Store store) {
       if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
-      _repository.UpdateStore(store);
+      await _repository.UpdateStoreAsync(store);
     }
 
     public IEnumerable<Store> GetStores() {
       return _repository.GetStores();
     }
 
-    public Store GetStore(int id) {
+    public Store GetStore(Guid id) {
       return _repository.GetStore(id);
     }
   }
