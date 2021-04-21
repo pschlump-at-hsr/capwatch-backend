@@ -55,7 +55,6 @@ Sonarqube:
       - .sonar/cache
   script:
     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.host.url="${SONARQUBE_HOST}" -Dsonar.login="${SONARQUBE_TOKEN}"
-  allow_failure: true
   only: ['merge_requests', 'develop', 'master']
 
 # TODO fix  failing Test stage
