@@ -6,6 +6,7 @@ namespace CapWatchBackend.Application.Handlers {
     void AddStore(Store store);
     void UpdateStore(Store store);
     IEnumerable<Store> GetStores();
+    IEnumerable<Store> GetStores(string filter);
     Store GetStore(int id);
   }
 }
