@@ -3,14 +3,15 @@ conn = new Mongo();
 admin = conn.getDB('admin');
 admin.auth('root', 'netwitness');
 admin.createUser({
-    user: config.MONGO_ADMINNAME,
-    pwd: config.MONGO_ADMINPASSWORD,
+    user: $MONGODB_ADMINUSER,
+    pwd: $MONGODB_ADMINPASSWORD,
     roles: ['userAdminAnyDatabase']
 });
 db = admin.getSiblingDB('capwatchDB');
 admin.createUser({
-    user: config.MONGO_USERNAME,
-    pwd: config.MONGO_PASSWORD,
+    user: $MONGODB_USERNAME,
+    pwd: $MONGODB_USERPASSWORD,
     roles: [{ role: "readWrite", db: "capwatchDB" }]
 });
 db.createCollection('stores');
+db.createCollection('storeTypes');
