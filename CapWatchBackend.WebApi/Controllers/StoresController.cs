@@ -3,7 +3,6 @@ using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Linq;
 
@@ -14,14 +13,14 @@ namespace CapWatchBackend.WebApi.Controllers {
     private readonly IStoreHandler _handler;
     private readonly IMapper _mapper;
 
-    public StoresController(ILogger<StoresController> logger, IStoreHandler handler, IMapper mapper) {
+    public StoresController(IStoreHandler handler, IMapper mapper) {
       _handler = handler;
       _mapper = mapper;
     }
 
     [HttpGet]
-    public IActionResult GetStores() {
-      var stores = _handler.GetStores();
+    public IActionResult GetStores(string filter = null) {
+      var stores = filter != null ? _handler.GetStores(filter) : _handler.GetStores();
       var result = stores.Select(store => _mapper.Map<StoreOverview>(store));
       return Ok(result);
     }

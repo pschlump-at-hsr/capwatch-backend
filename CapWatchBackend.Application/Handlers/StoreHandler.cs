@@ -3,6 +3,7 @@ using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -33,7 +34,16 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.GetStores();
     }
 
-    public Store GetStore(Guid id) {
+    public IEnumerable<Store> GetStores(string filter) {
+      bool filterFunction(Store store) => store.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        || store.Street.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
+        || store.City.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
+      int orderFunction(Store store) => store.Name.ToCharArray().Sum(x => x);
+
+      return _repository.GetStores(filterFunction, orderFunction, 0);
+    }
+
+    public Store GetStore(int id) {
       return _repository.GetStore(id);
     }
   }
