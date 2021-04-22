@@ -11,5 +11,6 @@ namespace CapWatchBackend.Domain.Entities {
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
     public Guid Secret { get; set; }
+    public StoreType StoreType { get; set; }
   }
 }

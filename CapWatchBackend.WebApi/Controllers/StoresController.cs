@@ -4,7 +4,7 @@ using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace CapWatchBackend.WebApi.Controllers {
@@ -19,26 +19,17 @@ namespace CapWatchBackend.WebApi.Controllers {
       _mapper = mapper;
     }
 
-    // todo Christoph 2021.04.15: Implement Type in Backend (Pseudodata for Frontend)
     [HttpGet]
     public IActionResult GetStores() {
       var stores = _handler.GetStores();
       var result = stores.Select(store => _mapper.Map<StoreOverview>(store));
-      var type = new StoreType() { Description = "Detailhandel" };
-      var tmpRes = new List<StoreOverview>();
-      foreach (var store in result) {
-        store.Type = type;
-        tmpRes.Add(store);
-      }
-      return Ok(tmpRes);
+      return Ok(result);
     }
 
     [HttpGet("{id}")]
     public IActionResult GetStores(Guid id) {
       var store = _handler.GetStore(id);
       var result = _mapper.Map<StoreOverview>(store);
-      var type = new StoreType() { Description = "Detailhandel" };
-      result.Type = type;
       return Ok(result);
     }
 

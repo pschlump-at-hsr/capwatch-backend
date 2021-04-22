@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CapWatchBackend.Domain.Entities;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreOverview {
@@ -14,6 +10,6 @@ namespace CapWatchBackend.WebApi.Models {
     public int MaxCapacity { get; set; }
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
-    public StoreType Type { get; set; }
+    public StoreType StoreType { get; set; }
   }
 }

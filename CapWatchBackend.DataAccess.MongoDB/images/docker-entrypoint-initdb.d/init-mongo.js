@@ -14,4 +14,4 @@ admin.createUser({
     roles: [{ role: "readWrite", db: "capwatchDB" }]
 });
 db.createCollection('stores');
-db.createCollection('storeTypes');
+db.createCollection('types');

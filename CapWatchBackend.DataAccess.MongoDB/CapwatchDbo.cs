@@ -1,5 +1,4 @@
-﻿using CapWatchBackend.Application.Repositories.Exceptions;
-using CapWatchBackend.DataAccess.MongoDB.Repositories;
+﻿using CapWatchBackend.Application.Exceptions;
 using CapWatchBackend.Domain.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -50,11 +49,26 @@ namespace CapWatchBackend.DataAccess.MongoDB {
          .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
          map.MapProperty(x => x.CurrentCapacity).SetElementName("currentCapacity");
          map.MapProperty(x => x.MaxCapacity).SetElementName("maxCapacity");
+         map.MapProperty(x => x.StoreType).SetElementName("storeType");
+       });
+      BsonClassMap.RegisterClassMap<StoreType>(
+       map => {
+         map.MapProperty(x => x.Description).SetElementName("name");
+         map.MapProperty(x => x.Id).SetElementName("_id")
+         .SetIdGenerator(GuidGenerator.Instance)
+         .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
        });
     }
     public IMongoCollection<Store> GetStoreCollection() {
       try {
         return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
+      } catch (MongoClientException e) {
+        throw new RepositoryException(e.Message, e);
+      }
+    }
+    public IMongoCollection<StoreType> GetTypeCollection() {
+      try {
+        return _database.GetCollection<StoreType>("types").WithWriteConcern(WriteConcern.WMajority);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }

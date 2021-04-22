@@ -2,10 +2,6 @@
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Mapper {
   public class MapperProfile : Profile {
@@ -16,6 +12,7 @@ namespace CapWatchBackend.WebApi.Mapper {
       CreateMap<StoreOverview, Store>().ReverseMap();
       CreateMap<StoreNew, Store>().ReverseMap();
       CreateMap<StoreNewResponse, Store>().ReverseMap();
+      CreateMap<StoreTypeModel, Store>().ReverseMap();
     }
   }
 }
