@@ -1,11 +1,7 @@
-﻿using CapWatchBackend.Application.Exceptions;
-using CapWatchBackend.Application.Handlers;
+﻿using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Tests.Mocks {
   class StoreHandlerMock : IStoreHandler {
@@ -33,7 +29,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
     }
 
     public void UpdateStore(Store store) {
-      
+      // Not needed for testing
     }
   }
 }
