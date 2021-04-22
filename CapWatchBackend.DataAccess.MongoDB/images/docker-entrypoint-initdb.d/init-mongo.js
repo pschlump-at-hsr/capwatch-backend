@@ -1,6 +1,6 @@
 const config = require('./config');
-conn = new Mongo();
-admin = conn.getDB('admin');
+const conn = new Mongo();
+const admin = conn.getDB('admin');
 admin.auth('root', 'netwitness');
 admin.createUser({
     user: $MONGODB_ADMINUSER,
