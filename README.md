@@ -2,14 +2,14 @@
 
 CapWatch Backend
 
-# Setup Visual Studio
+## Setup Visual Studio
 
-## Import vssettings
+### Import vssettings
 
 Tools -> Import and Export Settings -> Dialog
 Import selected environment settings -> Next -> No, just import new settings... -> Next -> Browse -> *select Settings File* -> Next -> Finish
 
-## Power Commands for Visual Studio
+### Power Commands for Visual Studio
 
 Code autoformatting and import organizer when file saved
 
@@ -21,10 +21,15 @@ MongoDB Tools -> Manage Extensions -> Search MongoDB Tools -> Install
 
 Password is capwusr123
 
-# Build and run Docker Container
+## Build and run Docker Container
 
 ```
 cd /path/to/capwatch-backend
 docker-compose up -d
 ```
 
+## Code Quality
+To ensure our Code Quality we use Sonarqube und Sonarlint.
+
+### Sonarqube Metrics
+The current state of the Code Quality for the develop Branch can be viewed at the following Sonarqube [Project Page](https://se1-sonarqube.dev.ifs.hsr.ch/dashboard?id=CapwatchBackend).
