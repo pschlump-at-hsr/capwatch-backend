@@ -13,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public class StoreRepository : IStoreRepository {
-    private IMongoCollection<Store> _storesCol;
+    private readonly IMongoCollection<Store> _storesCol;
+
     public StoreRepository(IOptions<ConfigureDatabase> options) {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);

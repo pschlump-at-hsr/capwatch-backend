@@ -12,12 +12,12 @@ namespace CapWatchBackend.DataAccess.MongoDB {
     private static string _connectionString;
 
     private static CapwatchDbo _instance;
-    private MongoClient _client;
-    private IMongoDatabase _database;
+    private readonly IMongoDatabase _database;
+
     private CapwatchDbo() {
       try {
-        _client = new MongoClient(_connectionString);
-        _database = _client.GetDatabase("capwatchDB");
+        var client = new MongoClient(_connectionString);
+        _database = client.GetDatabase("capwatchDB");
         SetupDatabaseMapping();
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
@@ -31,7 +31,6 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       }
       return _instance;
     }
-
 
     private void SetupDatabaseMapping() {
       BsonClassMap.RegisterClassMap<Store>(
