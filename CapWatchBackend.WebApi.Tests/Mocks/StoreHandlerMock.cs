@@ -2,7 +2,6 @@
 using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Tests.Mocks {
   class StoreHandlerMock : IStoreHandler {
@@ -30,8 +29,8 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
       return stores;
     }
 
-    public Task UpdateStoreAsync(Store store) {
-      return Task.CompletedTask;
+    public void UpdateStore(Store store) {
+      // Not needed for testing
     }
   }
 }

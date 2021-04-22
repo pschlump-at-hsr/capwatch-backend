@@ -1,4 +1,5 @@
 ﻿using CapWatchBackend.Application.Repositories.Exceptions;
+using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.Domain.Entities;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -13,10 +14,11 @@ namespace CapWatchBackend.DataAccess.MongoDB {
 
     private static CapwatchDbo _instance;
     private readonly IMongoDatabase _database;
+
     private CapwatchDbo() {
       try {
-        var _client = new MongoClient(_connectionString);
-        _database = _client.GetDatabase("capwatchDB");
+        var client = new MongoClient(_connectionString);
+        _database = client.GetDatabase("capwatchDB");
         SetupDatabaseMapping();
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
