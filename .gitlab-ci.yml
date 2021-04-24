@@ -39,14 +39,15 @@ Build:
 
 Sonarqube:
    stage: sonarqube-check
-   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-   entrypoint: [""]
-   only: ['merge_requests', 'develop', 'master']
+   image: 
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    entrypoint: [""]
    script:
     - "dotnet tool install --global dotnet-sonarscanner"
     - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
     - "dotnet build CapWatchBackend.sln"
     - "dotnet sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+   only: ['merge_requests', 'develop', 'master']
 
 
 
