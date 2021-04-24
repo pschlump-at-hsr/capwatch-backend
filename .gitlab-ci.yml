@@ -9,7 +9,7 @@ image: $DOCKER_IMAGE_DOCKER
 
 stages:
   - build
-  - sobarqube-build
+  - sonarqube-build
   - sonarqube-check
   - test
   - tag-develop
