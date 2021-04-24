@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Net;
 
 namespace CapWatchBackend.WebApi.ActionFilter {
   public class ExceptionFilter : IActionFilter, IOrderedFilter {
@@ -18,13 +20,22 @@ namespace CapWatchBackend.WebApi.ActionFilter {
     }
 
     public void OnActionExecuted(ActionExecutedContext context) {
-      if (context.Exception is BaseException exception) {
+      if (context.Exception is BaseException baseException) {
         context.Result = new ObjectResult(null) {
-          StatusCode = exception.Status
+          StatusCode = baseException.Status
+        };
+        context.ExceptionHandled = true;
+
+        _logger.LogError(baseException, baseException.Message);
+      } else if (context.Exception is Exception exception) {
+        context.Result = new ObjectResult(null) {
+          StatusCode = (int)HttpStatusCode.InternalServerError
         };
         context.ExceptionHandled = true;
 
         _logger.LogError(exception, exception.Message);
+      } else {
+        _logger.LogTrace("API call handled");
       }
     }
   }
