@@ -10,14 +10,14 @@ using Xunit;
 namespace CapWatchBackend.ApplicationTests {
   public class StoreHandlerTests {
     [Fact]
-    public void TestAddStoreGeneratesGuid() {
+    public async System.Threading.Tasks.Task TestAddStoreGeneratesGuidAsync() {
       var store = new Store();
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.AddStore(store)).Returns(store);
+      A.CallTo(() => repository.AddStoreAsync(store));
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.AddStore(store);
+      await storeHandler.AddStoreAsync(store);
 
       store.Secret.Should().NotBe(Guid.Empty);
     }
@@ -29,15 +29,15 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStore(1)).Returns(store);
+      A.CallTo(() => repository.GetStore(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
 
       var updatedStore = new Store {
-        Id = 1,
+        Id = Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"),
         Secret = Guid.Parse("00000000-0000-0000-0000-000000000002")
       };
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.Invoking(x => x.UpdateStore(updatedStore)).Should().Throw<SecretInvalidException>();
+      storeHandler.Invoking(x => x.UpdateStoreAsync(updatedStore).Wait()).Should().Throw<SecretInvalidException>();
     }
 
     [Fact]
@@ -47,15 +47,15 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStore(1)).Returns(store);
+      A.CallTo(() => repository.GetStore(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
 
       var updatedStore = new Store {
-        Id = 1,
+        Id = Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"),
         Secret = Guid.Parse("00000000-0000-0000-0000-000000000001")
       };
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.Invoking(x => x.UpdateStore(updatedStore)).Should().NotThrow();
+      storeHandler.Invoking(x => x.UpdateStoreAsync(updatedStore).Wait()).Should().NotThrow();
     }
   }
 }
