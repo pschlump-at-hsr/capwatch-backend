@@ -9,6 +9,7 @@ image: $DOCKER_IMAGE_DOCKER
 
 stages:
   - build
+  - sobarqube-build
   - sonarqube-check
   - test
   - tag-develop
@@ -38,6 +39,21 @@ Build:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
 Sonarqube:
+   stage: sonarqube-build
+    script: 
+      - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+      - docker pull $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG || true
+      # The built image is tagged locally with the commit SHA
+    - >
+      docker build
+      --pull
+      --build-arg VCS_REF=$CI_COMMIT_SHA
+      --build-arg VCS_URL=$CI_PROJECT_URL
+      --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
    stage: sonarqube-check
    image: 
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
