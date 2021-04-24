@@ -38,25 +38,39 @@ Build:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
 Sonarqube:
-  stage: sonarqube-check
-  image:
-    name: sonarsource/sonar-scanner-cli:4.6
-    entrypoint: [""]
-  services:
-  - docker:dind
-  variables:
-    # Defines the location of the analysis task cache
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-    # Tells git to fetch all the branches of the project, required by the analysis task
-    GIT_DEPTH: "0"
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.host.url="${SONARQUBE_HOST}" -Dsonar.login="${SONARQUBE_TOKEN}"
-  allow_failure: true
-  only: ['merge_requests', 'develop', 'master']
+   stage: sonarqube-check
+   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+   entrypoint: [""]
+   only: ['merge_requests', 'develop', 'master']
+   script:
+    - "dotnet tool install --global dotnet-sonarscanner"
+    - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+    - "dotnet build CapWatchBackend.sln"
+    - "dotnet sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+
+
+
+
+# Sonarqube:
+#   stage: sonarqube-check
+#   image:
+#     name: sonarsource/sonar-scanner-cli:4.6
+#     entrypoint: [""]
+#   services:
+#   - docker:dind
+#   variables:
+#     # Defines the location of the analysis task cache
+#     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+#     # Tells git to fetch all the branches of the project, required by the analysis task
+#     GIT_DEPTH: "0"
+#   cache:
+#     key: "${CI_JOB_NAME}"
+#     paths:
+#       - .sonar/cache
+#   script:
+#     - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.host.url="${SONARQUBE_HOST}" -Dsonar.login="${SONARQUBE_TOKEN}"
+#   allow_failure: true
+#   only: ['merge_requests', 'develop', 'master']
 
 # TODO fix  failing Test stage
 #   Problem ideas: 
