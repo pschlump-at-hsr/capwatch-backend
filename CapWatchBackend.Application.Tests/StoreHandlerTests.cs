@@ -10,14 +10,14 @@ using Xunit;
 namespace CapWatchBackend.ApplicationTests {
   public class StoreHandlerTests {
     [Fact]
-    public void TestAddStoreGeneratesGuid() {
+    public async System.Threading.Tasks.Task TestAddStoreGeneratesGuidAsync() {
       var store = new Store();
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.AddStoreAsync(store).Wait());
+      A.CallTo(() => repository.AddStoreAsync(store));
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.AddStoreAsync(store).Wait();
+      await storeHandler.AddStoreAsync(store);
 
       store.Secret.Should().NotBe(Guid.Empty);
     }
@@ -50,7 +50,7 @@ namespace CapWatchBackend.ApplicationTests {
       A.CallTo(() => repository.GetStore(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
 
       var updatedStore = new Store {
-        Id = Guid.Parse("00000000-0000-0000-0001-000000000001"),
+        Id = Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"),
         Secret = Guid.Parse("00000000-0000-0000-0000-000000000001")
       };
 

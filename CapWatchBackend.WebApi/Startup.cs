@@ -63,7 +63,6 @@ namespace CapWatchBackend.WebApi {
     }
 
     protected virtual void RegisterDependencies(IServiceCollection services) {
-      services.AddSingleton<ITypeRepository, TypeRepository>();
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();
       services.Configure<ConfigureDatabase>(Configuration.GetSection(nameof(ConfigureDatabase)));

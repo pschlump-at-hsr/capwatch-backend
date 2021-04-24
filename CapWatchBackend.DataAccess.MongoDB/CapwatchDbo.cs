@@ -34,6 +34,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
 
     private void SetupDatabaseMapping() {
       //Due to a bug this obsolete method is necessary
+#pragma warning disable CS0618 // Type or member is obsolete
       BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
       BsonClassMap.RegisterClassMap<Store>(
        map => {

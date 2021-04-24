@@ -16,6 +16,6 @@ namespace CapWatchBackend.WebApi.Models {
     public int? MaxCapacity { get; set; }
     public byte[] Logo { get; set; }
     [Required]
-    public string StoreType { get; set; }
+    public StoreTypeModel StoreType { get; set; }
   }
 }

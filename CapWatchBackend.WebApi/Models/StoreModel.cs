@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace CapWatchBackend.WebApi.Models {
   public class StoreModel {
     [Required]
-    public int Id { get; set; }
+    public string Id { get; set; }
     [Required]
     public string Name { get; set; }
     [Required]
@@ -23,6 +23,6 @@ namespace CapWatchBackend.WebApi.Models {
     [Required]
     public string Secret { get; set; }
     [Required]
-    public StoreTypeModel Type { get; set; }
+    public StoreTypeModel StoreType { get; set; }
   }
 }
