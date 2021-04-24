@@ -3,8 +3,9 @@ using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
@@ -18,40 +19,31 @@ namespace CapWatchBackend.WebApi.Controllers {
       _mapper = mapper;
     }
 
-    // todo Christoph 2021.04.15: Implement Type in Backend (Pseudodata for Frontend)
     [HttpGet]
-    public IActionResult GetStores(string filter = null) {
-      var stores = filter != null ? _handler.GetStores(filter) : _handler.GetStores();
+    public async Task<IActionResult> GetStores(string filter = null) {
+      var stores = filter != null ? await _handler.GetStores(filter) : await _handler.GetStores();
       var result = stores.Select(store => _mapper.Map<StoreOverview>(store));
-      var type = new StoreType() { Description = "Detailhandel" };
-      var tmpRes = new List<StoreOverview>();
-      foreach (var store in result) {
-        store.Type = type;
-        tmpRes.Add(store);
-      }
-      return Ok(tmpRes);
+      return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetStores(int id) {
-      var store = _handler.GetStore(id);
+    public async Task<IActionResult> GetStore(Guid id) {
+      var store = await _handler.GetStore(id);
       var result = _mapper.Map<StoreOverview>(store);
-      var type = new StoreType() { Description = "Detailhandel" };
-      result.Type = type;
       return Ok(result);
     }
 
     [HttpPatch]
-    public IActionResult UpdateStores(StoreModel model) {
+    public async Task<IActionResult> UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
-      _handler.UpdateStore(store);
+      await _handler.UpdateStoreAsync(store);
       return Ok();
     }
 
     [HttpPost]
-    public IActionResult PostStores(StoreNew model) {
+    public async Task<IActionResult> PostStores(StoreNew model) {
       var store = _mapper.Map<Store>(model);
-      _handler.AddStore(store);
+      await _handler.AddStoreAsync(store);
       var result = _mapper.Map<StoreNewResponse>(store);
       return Ok(result);
     }

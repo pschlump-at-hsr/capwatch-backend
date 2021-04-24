@@ -39,3 +39,4 @@ msbuild.wrn
 .vs/
 
 *.orig
+/CapWatchBackend.DataAccess.MongoDB/images/docker-entrypoint-initdb.d/config.js

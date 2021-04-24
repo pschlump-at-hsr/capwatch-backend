@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 [assembly: InternalsVisibleTo("CapWatchBackend.WebApi")]
 [assembly: InternalsVisibleTo("CapWatchBackend.Application.Tests")]
@@ -16,24 +17,24 @@ namespace CapWatchBackend.Application.Handlers {
       _repository = repository;
     }
 
-    public void AddStore(Store store) {
+    public Task AddStoreAsync(Store store) {
       store.Secret = Guid.NewGuid();
-      _repository.AddStore(store);
+      return _repository.AddStoreAsync(store);
     }
 
-    public void UpdateStore(Store store) {
-      if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret)) {
+    public Task UpdateStoreAsync(Store store) {
+      if (!_repository.GetStore(store.Id).Result.Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
-      _repository.UpdateStore(store);
+      return _repository.UpdateStoreAsync(store);
     }
 
-    public IEnumerable<Store> GetStores() {
+    public Task<IEnumerable<Store>> GetStores() {
       return _repository.GetStores();
     }
 
-    public IEnumerable<Store> GetStores(string filter) {
+    public Task<IEnumerable<Store>> GetStores(string filter) {
       bool filterFunction(Store store) => store.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.Street.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.City.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
@@ -42,7 +43,7 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.GetStores(filterFunction, orderFunction, 0);
     }
 
-    public Store GetStore(int id) {
+    public Task<Store> GetStore(Guid id) {
       return _repository.GetStore(id);
     }
   }

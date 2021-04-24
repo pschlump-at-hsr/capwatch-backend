@@ -1,6 +1,6 @@
 ﻿namespace CapWatchBackend.WebApi.Models {
-  public class StoreNewResponse {
+  public class StoreTypeModel {
     public string Id { get; set; }
-    public string Secret { get; set; }
+    public string Description { get; set; }
   }
 }
