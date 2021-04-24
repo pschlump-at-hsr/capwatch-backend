@@ -23,18 +23,18 @@ namespace CapWatchBackend.Application.Handlers {
     }
 
     public async Task UpdateStoreAsync(Store store) {
-      if (!_repository.GetStore(store.Id).Secret.Equals(store.Secret)) {
+      if (!_repository.GetStore(store.Id).Result.Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
       await _repository.UpdateStoreAsync(store);
     }
 
-    public IEnumerable<Store> GetStores() {
+    public Task<IEnumerable<Store>> GetStores() {
       return _repository.GetStores();
     }
 
-    public IEnumerable<Store> GetStores(string filter) {
+    public Task<IEnumerable<Store>> GetStores(string filter) {
       bool filterFunction(Store store) => store.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.Street.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.City.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
@@ -43,7 +43,7 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.GetStores(filterFunction, orderFunction, 0);
     }
 
-    public Store GetStore(int id) {
+    public Task<Store> GetStore(Guid id) {
       return _repository.GetStore(id);
     }
   }

@@ -12,7 +12,7 @@ namespace CapWatchBackend.WebApi.Mapper {
       CreateMap<StoreOverview, Store>().ReverseMap();
       CreateMap<StoreNew, Store>().ReverseMap();
       CreateMap<StoreNewResponse, Store>().ReverseMap();
-      CreateMap<StoreTypeModel, Store>().ReverseMap();
+      CreateMap<StoreTypeModel, StoreType>().ReverseMap();
     }
   }
 }
