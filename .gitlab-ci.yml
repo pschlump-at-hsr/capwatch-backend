@@ -4,6 +4,7 @@ variables:
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
   TEST_DIR: "CapWatchBackend.WebApi.Tests"
+  Code-Coverage: "Code Coverage"
 
 image: $DOCKER_IMAGE_DOCKER
 
@@ -67,16 +68,13 @@ Sonarqube-Check:
       - "export PATH=$PATH:/root/.dotnet/tools"
       - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST} /d:sonar.vbnet.xunit.reportsPaths=./testreports"
       - "dotnet build CapWatchBackend.sln"
-      - "dotnet test --collect:Code Coverage"
+      - "ls"
+      - "dotnet test --collect:${CODE_COVERAGE}"
       - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
    allow_failure: true
    only: ['merge_requests', 'develop', 'master']
 
 
-# TODO fix  failing Test stage
-#   Problem ideas: 
-#   - stdin out not true
-#   - entrypoint have to be overwritten => this is causing an error "sh: 3: set: Illegal option -o pipefail"
 
 Test:
   stage: test
