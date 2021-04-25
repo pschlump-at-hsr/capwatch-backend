@@ -1,34 +1,41 @@
 ﻿using CapWatchBackend.Application.Exceptions;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Net;
 
 namespace CapWatchBackend.WebApi.ActionFilter {
   public class ExceptionFilter : IActionFilter, IOrderedFilter {
-    private readonly IWebHostEnvironment _hostEnvironment;
-
-    public ExceptionFilter(IWebHostEnvironment hostEnvironment) {
-      _hostEnvironment = hostEnvironment;
-    }
+    private readonly ILogger<ExceptionFilter> _logger;
 
     public int Order { get; } = int.MaxValue;
 
+    public ExceptionFilter(ILogger<ExceptionFilter> logger) {
+      _logger = logger;
+    }
+
     public void OnActionExecuting(ActionExecutingContext context) {
-      // Implemented because of interface, no logic needed before API execution
+      _logger.LogTrace("API call received");
     }
 
     public void OnActionExecuted(ActionExecutedContext context) {
-      if (context.Exception is BaseException exception) {
-        dynamic result;
-        if (_hostEnvironment.EnvironmentName.Equals("Development")) {
-          result = new { exception.Message, exception.StackTrace };
-        } else {
-          result = new { exception.Message };
-        }
-        context.Result = new ObjectResult(result) {
-          StatusCode = exception.Status
+      if (context.Exception is BaseException baseException) {
+        context.Result = new ObjectResult(null) {
+          StatusCode = baseException.Status
         };
         context.ExceptionHandled = true;
+
+        _logger.LogError(baseException, baseException.Message);
+      } else if (context.Exception is Exception exception) {
+        context.Result = new ObjectResult(null) {
+          StatusCode = (int)HttpStatusCode.InternalServerError
+        };
+        context.ExceptionHandled = true;
+
+        _logger.LogError(exception, exception.Message);
+      } else {
+        _logger.LogTrace("API call handled");
       }
     }
   }

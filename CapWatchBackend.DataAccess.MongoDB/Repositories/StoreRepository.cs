@@ -1,6 +1,7 @@
 ﻿using CapWatchBackend.Application.Exceptions;
 using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.IdGenerators;
@@ -16,14 +17,18 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public sealed class StoreRepository : IStoreRepository {
     private readonly IMongoCollection<Store> _storesCol;
     private readonly IMongoCollection<StoreType> _typesCol;
+<<<<<<< CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
 
     public StoreRepository(IOptions<DatabaseConfiguration> options) {
+=======
+    public StoreRepository(IOptions<ConfigureDatabase> options, ILogger<StoreRepository> logger) {
+>>>>>>> CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
         _typesCol = capWatchDbo.GetTypeCollection();
       } catch (RepositoryException e) {
-        DbLogger.Log(e.Message);
+        logger.LogError(e, e.Message);
       }
     }
 
