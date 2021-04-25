@@ -18,7 +18,8 @@ COPY . ./
 
 RUN dotnet publish -c Release -o out
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends openjdk-11-jre
+    && apt-get install -y apt-utils \
+    && apt-get install -y --no-install-recommends openjdk-11-jre
 RUN java --version
 
 EXPOSE 80
