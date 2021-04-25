@@ -11,7 +11,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
     private readonly IMapper _mapper;
 
     public StoreModelTests() {
-      _mapper = new MapperConfiguration(cfg => cfg.AddProfile(new MapperProfile())).CreateMapper();
+      _mapper = new MapperConfiguration(config => config.AddProfile(new MapperProfile())).CreateMapper();
     }
 
     [Theory]

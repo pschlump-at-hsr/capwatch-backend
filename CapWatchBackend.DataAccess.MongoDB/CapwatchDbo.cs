@@ -7,10 +7,8 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace CapWatchBackend.DataAccess.MongoDB {
-  class CapwatchDbo {
-
+  internal sealed class CapwatchDbo {
     private static string _connectionString;
-
     private static CapwatchDbo _instance;
     private readonly IMongoDatabase _database;
 
@@ -36,30 +34,28 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       //Due to a bug this obsolete method is necessary
 #pragma warning disable CS0618 // Type or member is obsolete
       BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
+#pragma warning restore CS0618 // Type or member is obsolete
       BsonClassMap.RegisterClassMap<Store>(
        map => {
-         map.MapProperty(x => x.Name).SetElementName("name");
-         map.MapProperty(x => x.Street).SetElementName("street");
-         map.MapProperty(x => x.ZipCode).SetElementName("zipCode");
-         map.MapProperty(x => x.City).SetElementName("city");
-         map.MapProperty(x => x.Logo).SetElementName("logo");
-         map.MapProperty(x => x.Secret).SetElementName("secret")
-         .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
-         map.MapProperty(x => x.Id).SetElementName("_id")
-         .SetIdGenerator(GuidGenerator.Instance)
-         .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
-         map.MapProperty(x => x.CurrentCapacity).SetElementName("currentCapacity");
-         map.MapProperty(x => x.MaxCapacity).SetElementName("maxCapacity");
-         map.MapProperty(x => x.StoreType).SetElementName("storeType");
+         map.MapProperty(store => store.Name).SetElementName("name");
+         map.MapProperty(store => store.Street).SetElementName("street");
+         map.MapProperty(store => store.ZipCode).SetElementName("zipCode");
+         map.MapProperty(store => store.City).SetElementName("city");
+         map.MapProperty(store => store.Logo).SetElementName("logo");
+         map.MapProperty(store => store.Secret).SetElementName("secret").SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+         map.MapProperty(store => store.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+         map.MapProperty(store => store.CurrentCapacity).SetElementName("currentCapacity");
+         map.MapProperty(store => store.MaxCapacity).SetElementName("maxCapacity");
+         map.MapProperty(store => store.StoreType).SetElementName("storeType");
        });
+
       BsonClassMap.RegisterClassMap<StoreType>(
        map => {
-         map.MapProperty(x => x.Description).SetElementName("name");
-         map.MapProperty(x => x.Id).SetElementName("_id")
-         .SetIdGenerator(GuidGenerator.Instance)
-         .SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+         map.MapProperty(storeType => storeType.Description).SetElementName("name");
+         map.MapProperty(storeType => storeType.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
        });
     }
+
     public IMongoCollection<Store> GetStoreCollection() {
       try {
         return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
@@ -67,6 +63,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
         throw new RepositoryException(e.Message, e);
       }
     }
+
     public IMongoCollection<StoreType> GetTypeCollection() {
       try {
         return _database.GetCollection<StoreType>("types").WithWriteConcern(WriteConcern.WMajority);

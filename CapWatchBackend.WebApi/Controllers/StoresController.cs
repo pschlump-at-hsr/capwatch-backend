@@ -21,15 +21,15 @@ namespace CapWatchBackend.WebApi.Controllers {
 
     [HttpGet]
     public async Task<IActionResult> GetStores(string filter = null) {
-      var stores = filter != null ? await _handler.GetStores(filter) : await _handler.GetStores();
-      var result = stores.Select(store => _mapper.Map<StoreOverview>(store));
+      var stores = filter != null ? await _handler.GetStoresAsync(filter) : await _handler.GetStoresAsync();
+      var result = stores.Select(store => _mapper.Map<StoreOverviewModel>(store));
       return Ok(result);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetStore(Guid id) {
-      var store = await _handler.GetStore(id);
-      var result = _mapper.Map<StoreOverview>(store);
+      var store = await _handler.GetStoreAsync(id);
+      var result = _mapper.Map<StoreOverviewModel>(store);
       return Ok(result);
     }
 
@@ -41,10 +41,10 @@ namespace CapWatchBackend.WebApi.Controllers {
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostStores(StoreNew model) {
+    public async Task<IActionResult> PostStores(NewStoreModel model) {
       var store = _mapper.Map<Store>(model);
       await _handler.AddStoreAsync(store);
-      var result = _mapper.Map<StoreNewResponse>(store);
+      var result = _mapper.Map<NewStoreResponseModel>(store);
       return Ok(result);
     }
   }
