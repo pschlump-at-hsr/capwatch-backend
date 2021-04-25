@@ -4,7 +4,7 @@ variables:
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
   TEST_DIR: "CapWatchBackend.WebApi.Tests"
-  Code-Coverage: "Code Coverage"
+  Code_Coverage: "Code Coverage"
 
 image: $DOCKER_IMAGE_DOCKER
 
