@@ -50,8 +50,8 @@ namespace CapWatchBackend.DataAccess.MongoDB {
 
       BsonClassMap.RegisterClassMap<StoreType>(
        map => {
-         map.MapProperty(type => type.Description).SetElementName("name");
-         map.MapProperty(type => type.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+         map.MapProperty(storeType => storeType.Description).SetElementName("name");
+         map.MapProperty(storeType => storeType.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
        });
     }
 
