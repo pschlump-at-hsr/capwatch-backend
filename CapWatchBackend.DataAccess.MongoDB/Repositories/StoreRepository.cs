@@ -17,12 +17,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public sealed class StoreRepository : IStoreRepository {
     private readonly IMongoCollection<Store> _storesCol;
     private readonly IMongoCollection<StoreType> _typesCol;
-<<<<<<< CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
-
-    public StoreRepository(IOptions<DatabaseConfiguration> options) {
-=======
-    public StoreRepository(IOptions<ConfigureDatabase> options, ILogger<StoreRepository> logger) {
->>>>>>> CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
+    public StoreRepository(IOptions<DatabaseConfiguration> options, ILogger<StoreRepository> logger) {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
