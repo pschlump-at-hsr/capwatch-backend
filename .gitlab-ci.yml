@@ -67,6 +67,7 @@ Sonarqube-Check:
       - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
       - "dotnet build CapWatchBackend.sln"
       - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
+   allow_failure: true
    only: ['merge_requests', 'develop', 'master']
 
 
