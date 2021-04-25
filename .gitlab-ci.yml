@@ -47,12 +47,13 @@ Sonarqube-Build:
       - >
         docker build
         --pull
+        --file Dockerfile.dev
         --build-arg VCS_REF=$CI_COMMIT_SHA
         --build-arg VCS_URL=$CI_PROJECT_URL
         --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
-        --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+        --tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}Dev_Build
         .
-      - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}Dev_Build
    only: ['merge_requests', 'develop', 'master']
 
 Sonarqube-Check:
