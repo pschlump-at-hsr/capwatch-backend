@@ -51,22 +51,22 @@ Sonarqube-Build:
         --build-arg VCS_REF=$CI_COMMIT_SHA
         --build-arg VCS_URL=$CI_PROJECT_URL
         --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
-        --tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}Dev_Build
+        --tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
         .
-      - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}Dev_Build
+      - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
    only: ['merge_requests', 'develop', 'master']
 
 Sonarqube-Check:
    stage: sonarqube-check
    image: 
-    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}Dev_Build
+    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
     entrypoint: [""]
    script:
     - "dotnet tool install --global dotnet-sonarscanner"
     - "export PATH=$PATH:/root/.dotnet/tools"
     - "dotnet-sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
     - "dotnet build CapWatchBackend.sln"
-    - "dotnet-sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+    - "dotnet-sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN}
    only: ['merge_requests', 'develop', 'master']
 
 
