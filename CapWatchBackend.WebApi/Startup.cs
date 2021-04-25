@@ -1,6 +1,5 @@
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Application.Repositories;
-using CapWatchBackend.DataAccess.MongoDB;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.WebApi.ActionFilter;
 using CapWatchBackend.WebApi.Mapper;
@@ -37,8 +36,8 @@ namespace CapWatchBackend.WebApi {
 
       services.AddAutoMapper(typeof(MapperProfile));
 
-      services.AddSwaggerGen(options => {
-        options.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });
+      services.AddSwaggerGen(c => {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });
       });
     }
 
@@ -49,7 +48,7 @@ namespace CapWatchBackend.WebApi {
 
       if (env.IsDevelopment()) {
         app.UseSwagger();
-        app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "CapWatchBackend.WebApi v1"));
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CapWatchBackend.WebApi v1"));
       }
 
       app.UseHttpsRedirection();
@@ -66,7 +65,7 @@ namespace CapWatchBackend.WebApi {
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();
-      services.Configure<DatabaseConfiguration>(Configuration.GetSection(nameof(DatabaseConfiguration)));
+      services.Configure<ConfigureDatabase>(Configuration.GetSection(nameof(ConfigureDatabase)));
     }
   }
 }

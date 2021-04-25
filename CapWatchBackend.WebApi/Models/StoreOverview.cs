@@ -1,7 +1,7 @@
 ﻿using CapWatchBackend.Domain.Entities;
 
 namespace CapWatchBackend.WebApi.Models {
-  public class StoreOverviewModel {
+  public class StoreOverview {
     public string Id { get; set; }
     public string Name { get; set; }
     public string Street { get; set; }

@@ -13,7 +13,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
       return Task.CompletedTask;
     }
 
-    public Task<Store> GetStoreAsync(Guid id) {
+    public Task<Store> GetStore(Guid id) {
       if (id == Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f")) {
         return Task.Factory.StartNew(() => {
           return new Store {
@@ -36,7 +36,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync() {
+    public Task<IEnumerable<Store>> GetStores() {
       List<Store> stores = new List<Store> {
         new Store {
           Id = Guid.Parse("9c9cee44-c839-48f2-b54e-237d95fe5d7f"),
@@ -84,7 +84,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
       return Task.Factory.StartNew(() => { return (IEnumerable<Store>)stores; });
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync(string filter) {
+    public Task<IEnumerable<Store>> GetStores(string filter) {
       List<Store> stores = new List<Store> {
         new Store {
           Id = Guid.Parse("9c9cee44-c839-48f2-b54e-237d95fe5d7f"),
@@ -130,7 +130,7 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
       };
 
       return Task.Factory.StartNew(() => {
-        return stores.Where(store => store.Name.Contains(filter));
+        return stores.Where(x => x.Name.Contains(filter));
       });
     }
 

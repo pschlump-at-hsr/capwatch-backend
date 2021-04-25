@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
-  public class NewStoreModel {
+  public class StoreNew {
 
     [Required]
     public string Name { get; set; }

@@ -14,15 +14,10 @@ using System.Threading.Tasks;
 
 
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
-  public sealed class StoreRepository : IStoreRepository {
+  public class StoreRepository : IStoreRepository {
     private readonly IMongoCollection<Store> _storesCol;
     private readonly IMongoCollection<StoreType> _typesCol;
-<<<<<<< CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
-
-    public StoreRepository(IOptions<DatabaseConfiguration> options) {
-=======
     public StoreRepository(IOptions<ConfigureDatabase> options, ILogger<StoreRepository> logger) {
->>>>>>> CapWatchBackend.DataAccess.MongoDB/Repositories/StoreRepository.cs
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
         _storesCol = capWatchDbo.GetStoreCollection();
@@ -38,8 +33,8 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       _typesCol = capWatchDbo.GetTypeCollection();
     }
 
-    public bool IsValidType(StoreType storeType) {
-      return _typesCol.AsQueryable().Any(type => type.Id == storeType.Id);
+    public Boolean IsValidType(StoreType type) {
+      return _typesCol.AsQueryable().Where(x => x.Id == type.Id).Count() == 1;
     }
 
     public Task AddStoreAsync(Store store) {
@@ -98,7 +93,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync() {
+    public Task<IEnumerable<Store>> GetStores() {
       try {
         return Task.Factory.StartNew(() => {
           return (IEnumerable<Store>)_storesCol.Find(FilterDefinition<Store>.Empty).ToList();
@@ -108,7 +103,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy) {
+    public Task<IEnumerable<Store>> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy) {
       try {
         return Task.Factory.StartNew(() => {
           return (IEnumerable<Store>)_storesCol.AsQueryable()
@@ -120,17 +115,17 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<Store> GetStoreAsync(Guid id) {
+    public Task<Store> GetStore(Guid id) {
       try {
         return Task.Factory.StartNew(() => {
-          return _storesCol.AsQueryable().FirstOrDefault(store => store.Id == id);
+          return _storesCol.AsQueryable().Where(x => x.Id == id).FirstOrDefault();
         });
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
-    public async void DeleteAllStoresAsync() {
+    public async void DeleteAllStores() {
       try {
         await _storesCol.DeleteManyAsync(FilterDefinition<Store>.Empty);
       } catch (MongoClientException e) {
@@ -138,7 +133,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public async void DeleteStoreAsync(Store store) {
+    public async void DeleteStore(Store store) {
       try {
         await _storesCol.DeleteManyAsync(new BsonDocument("storeId", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
       } catch (MongoClientException e) {

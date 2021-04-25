@@ -13,7 +13,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
     private readonly StoreRepository _storeRepository;
     public StoreModelTests() {
       _storeRepository = new StoreRepository("mongodb://capwusr:capwusr123@localhost:27017/admin");
-      _storeRepository.DeleteAllStoresAsync();
+      _storeRepository.DeleteAllStores();
     }
 
     [Fact]
@@ -22,7 +22,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       await _storeRepository.AddStoreAsync(store);
       store.Id.Should().NotBe(Guid.Parse("00000000-0000-0000-0000-000000000000"))
           .And.Should().NotBeNull();
-      store = await _storeRepository.GetStoreAsync(store.Id);
+      store = await _storeRepository.GetStore(store.Id);
       store.Name.Should().Be("Botanischer Garten der Universität Bern");
     }
 
@@ -72,7 +72,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
         }
       };
       await _storeRepository.AddStoresAsync(stores);
-      stores = (List<Store>)await _storeRepository.GetStoresAsync();
+      stores = (List<Store>)await _storeRepository.GetStores();
       stores.Count.Should().Be(3);
       foreach (var store in stores) {
         store.Name.Should().NotBeNullOrEmpty();
@@ -85,7 +85,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       await _storeRepository.AddStoreAsync(store);
       store = new Store { Id = store.Id, Name = "Botanischer Garten St. Gallen", Secret = new Guid("57bd0e44-4032-4a9c-b48e-c89d990bcd6f"), Street = "Keine Ahnung", ZipCode = "9008", City = "Bern", CurrentCapacity = 103, MaxCapacity = 103, StoreType = new StoreType { Id = Guid.Parse("c73e9c5f-de5c-479a-b116-7ee1b93ab4f9"), Description = "Detailhändler" } };
       await _storeRepository.UpdateStoreAsync(store);
-      _storeRepository.GetStoreAsync(store.Id).GetAwaiter().GetResult().Name.Should().Be("Botanischer Garten St. Gallen");
+      _storeRepository.GetStore(store.Id).GetAwaiter().GetResult().Name.Should().Be("Botanischer Garten St. Gallen");
     }
   }
 }
