@@ -67,7 +67,7 @@ Sonarqube-Check:
       - "export PATH=$PATH:/root/.dotnet/tools"
       - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST} /d:sonar.vbnet.xunit.reportsPaths=./testreports"
       - "dotnet build CapWatchBackend.sln"
-      - "dotnet test --collect:Code Coverage -r ./testreports"
+      - "dotnet test --collect:Code Coverage --results-directory:./testreports"
       - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
    allow_failure: true
    only: ['merge_requests', 'develop', 'master']
