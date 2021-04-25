@@ -36,9 +36,9 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
         StoreType = new StoreType { Id = Guid.Parse(typeId), Description = typeDescription }
       };
 
-      var storeNewResponse = _mapper.Map<StoreNewResponse>(store);
-      storeNewResponse.Id.Should().BeEquivalentTo(id);
-      storeNewResponse.Secret.Should().BeEquivalentTo(secret);
+      var newStoreResponse = _mapper.Map<NewStoreResponseModel>(store);
+      newStoreResponse.Id.Should().BeEquivalentTo(id);
+      newStoreResponse.Secret.Should().BeEquivalentTo(secret);
     }
   }
 }

@@ -36,7 +36,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
         StoreType = new StoreType { Id = Guid.Parse(typeId), Description = typeDescription }
       };
 
-      var storeOverview = _mapper.Map<StoreOverview>(store);
+      var storeOverview = _mapper.Map<StoreOverviewModel>(store);
 
       storeOverview.Id.Should().Be(id);
       storeOverview.Name.Should().Be(name);

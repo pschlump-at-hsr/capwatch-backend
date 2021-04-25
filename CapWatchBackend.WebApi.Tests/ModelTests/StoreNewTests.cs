@@ -24,7 +24,7 @@ namespace CapWatchBackend.WebApi.Tests.ModelTests {
     [InlineData("Zoo Zürich", "Zürichbergstrasse 221", "8044", "Zürich", 487, "asdf", "7b0523b7-4efd-4fdf-b11d-3f4d26cf7b19", "Freizeit")]
     [InlineData("Polenmuseum - Schloss Rapperswil", "Schloss", "8640", "Raperswil-Jona", 11, "jkl", "f58957ce-fb83-4f62-ac2c-6d1fe810d85c", "Bank")]
     public void TestMapper(string name, string street, string zipCode, string city, int maxCapacity, string logo, string typeId, string typeDescription) {
-      var newStore = new StoreNew {
+      var newStore = new NewStoreModel {
         Name = name,
         Street = street,
         ZipCode = zipCode,
