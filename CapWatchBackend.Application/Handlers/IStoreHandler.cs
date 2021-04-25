@@ -7,8 +7,8 @@ namespace CapWatchBackend.Application.Handlers {
   public interface IStoreHandler {
     Task AddStoreAsync(Store store);
     Task UpdateStoreAsync(Store store);
-    Task<IEnumerable<Store>> GetStores();
-    Task<IEnumerable<Store>> GetStores(string filter);
-    Task<Store> GetStore(Guid id);
+    Task<IEnumerable<Store>> GetStoresAsync();
+    Task<IEnumerable<Store>> GetStoresAsync(string filter);
+    Task<Store> GetStoreAsync(Guid id);
   }
 }

@@ -32,7 +32,7 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStore(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
+      A.CallTo(() => repository.GetStoreAsync(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
 
       var updatedStore = new Store {
         Id = Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"),
@@ -40,7 +40,7 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.Invoking(x => x.UpdateStoreAsync(updatedStore).Wait()).Should().Throw<SecretInvalidException>();
+      storeHandler.Invoking(async handler => await handler.UpdateStoreAsync(updatedStore)).Should().Throw<SecretInvalidException>();
     }
 
     [Fact]
@@ -50,7 +50,7 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStore(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
+      A.CallTo(() => repository.GetStoreAsync(Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"))).Returns(store);
 
       var updatedStore = new Store {
         Id = Guid.Parse("9c9cee44-c839-48f2-b54e-235d95fe5d7f"),
@@ -58,7 +58,7 @@ namespace CapWatchBackend.ApplicationTests {
       };
 
       var storeHandler = new StoreHandler(repository);
-      storeHandler.Invoking(x => x.UpdateStoreAsync(updatedStore).Wait()).Should().NotThrow();
+      storeHandler.Invoking(async handler => await handler.UpdateStoreAsync(updatedStore)).Should().NotThrow();
     }
 
     [Theory]
