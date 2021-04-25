@@ -63,9 +63,9 @@ Sonarqube-Check:
     entrypoint: [""]
    script:
     - "dotnet tool install --global dotnet-sonarscanner"
-    - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+    - "dotnet-sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
     - "dotnet build CapWatchBackend.sln"
-    - "dotnet sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+    - "dotnet-sonarscanner end /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
    only: ['merge_requests', 'develop', 'master']
 
 
