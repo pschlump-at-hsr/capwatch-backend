@@ -10,7 +10,6 @@ namespace CapWatchBackend.WebApi.Models {
     public int MaxCapacity { get; set; }
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
-    public string Secret { get; set; }
     public StoreType StoreType { get; set; }
   }
 }
