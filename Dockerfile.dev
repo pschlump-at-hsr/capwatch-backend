@@ -17,6 +17,9 @@ RUN dotnet restore
 COPY . ./
 
 RUN dotnet publish -c Release -o out
+RUN echo "https://ftp.halifax.rwth-aachen.de/alpine/edge/community/" >> /etc/apk/repositories && \
+    apk update && \
+    apk add openjdk11 \
 
 EXPOSE 80
 
