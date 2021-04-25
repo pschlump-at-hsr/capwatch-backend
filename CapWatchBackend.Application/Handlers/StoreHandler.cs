@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 [assembly: InternalsVisibleTo("CapWatchBackend.WebApi")]
 [assembly: InternalsVisibleTo("CapWatchBackend.Application.Tests")]
 namespace CapWatchBackend.Application.Handlers {
-  internal class StoreHandler : IStoreHandler {
+  internal sealed class StoreHandler : IStoreHandler {
     private readonly IStoreRepository _repository;
 
     public StoreHandler(IStoreRepository repository) {
@@ -23,28 +23,28 @@ namespace CapWatchBackend.Application.Handlers {
     }
 
     public Task UpdateStoreAsync(Store store) {
-      if (!_repository.GetStore(store.Id).Result.Secret.Equals(store.Secret)) {
+      if (!_repository.GetStoreAsync(store.Id).Result.Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
       return _repository.UpdateStoreAsync(store);
     }
 
-    public Task<IEnumerable<Store>> GetStores() {
-      return _repository.GetStores();
+    public Task<IEnumerable<Store>> GetStoresAsync() {
+      return _repository.GetStoresAsync();
     }
 
-    public Task<IEnumerable<Store>> GetStores(string filter) {
+    public Task<IEnumerable<Store>> GetStoresAsync(string filter) {
       bool filterFunction(Store store) => store.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.Street.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
         || store.City.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
       int orderFunction(Store store) => store.Name.ToCharArray().Sum(x => x);
 
-      return _repository.GetStores(filterFunction, orderFunction, 0);
+      return _repository.GetStoresAsync(filterFunction, orderFunction, 0);
     }
 
-    public Task<Store> GetStore(Guid id) {
-      return _repository.GetStore(id);
+    public Task<Store> GetStoreAsync(Guid id) {
+      return _repository.GetStoreAsync(id);
     }
   }
 }

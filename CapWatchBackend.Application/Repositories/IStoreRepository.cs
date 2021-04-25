@@ -11,11 +11,11 @@ namespace CapWatchBackend.Application.Repositories {
     public Task UpdateStoreAsync(Store store);
     public Task UpdateStoresAsync(IEnumerable<Store> stores);
 
-    public Task<IEnumerable<Store>> GetStores();
-    public Task<IEnumerable<Store>> GetStores(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy);
-    public Task<Store> GetStore(Guid id);
+    public Task<IEnumerable<Store>> GetStoresAsync();
+    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy);
+    public Task<Store> GetStoreAsync(Guid id);
 
-    public void DeleteAllStores();
-    public void DeleteStore(Store store);
+    public void DeleteAllStoresAsync();
+    public void DeleteStoreAsync(Store store);
   }
 }
