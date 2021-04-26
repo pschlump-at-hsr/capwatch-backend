@@ -3,7 +3,8 @@ variables:
   SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
-  TEST_DIR: "CapWatchBackend.WebApi.Tests"
+  TEST_DIR_1: "CapWatchBackend.WebApi.Tests"
+  TEST_DIR_2: "CapWatchBackend.Application.Tests"
   Code_Coverage: "Code Coverage"
 
 image: $DOCKER_IMAGE_DOCKER
@@ -73,15 +74,17 @@ Sonarqube-Check:
    only: ['merge_requests', 'develop', 'master']
 
 
-
 Test:
   stage: test
   image:
     name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
     entrypoint: [""]
   only: ['merge_requests', 'develop', 'master']
+  allow_failure: true
   script:
-    - "cd $TEST_DIR"
+    - "cd $TEST_DIR_1"
+    - "dotnet test"
+    - "cd ../${TEST_DIR_2}"
     - "dotnet test"
 
 
