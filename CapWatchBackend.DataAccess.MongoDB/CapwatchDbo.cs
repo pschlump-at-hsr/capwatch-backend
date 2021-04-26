@@ -35,6 +35,12 @@ namespace CapWatchBackend.DataAccess.MongoDB {
 #pragma warning disable CS0618 // Type or member is obsolete
       BsonDefaults.GuidRepresentationMode = GuidRepresentationMode.V3;
 #pragma warning restore CS0618 // Type or member is obsolete
+      BsonClassMap.RegisterClassMap<StoreType>(
+       map => {
+         map.MapProperty(storeType => storeType.Description).SetElementName("name");
+         map.MapProperty(storeType => storeType.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
+       });
+
       BsonClassMap.RegisterClassMap<Store>(
        map => {
          map.MapProperty(store => store.Name).SetElementName("name");
@@ -46,14 +52,9 @@ namespace CapWatchBackend.DataAccess.MongoDB {
          map.MapProperty(store => store.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
          map.MapProperty(store => store.CurrentCapacity).SetElementName("currentCapacity");
          map.MapProperty(store => store.MaxCapacity).SetElementName("maxCapacity");
-         map.MapProperty(store => store.StoreType).SetElementName("storeType");
+         map.MapProperty(store => store.StoreType).SetElementName("storeType").SetSerializer(new BsonClassMapSerializer<StoreType>(BsonClassMap.LookupClassMap(typeof(StoreType))));
        });
 
-      BsonClassMap.RegisterClassMap<StoreType>(
-       map => {
-         map.MapProperty(storeType => storeType.Description).SetElementName("name");
-         map.MapProperty(storeType => storeType.Id).SetElementName("_id").SetIdGenerator(GuidGenerator.Instance).SetSerializer(new GuidSerializer(GuidRepresentation.Standard));
-       });
     }
 
     public IMongoCollection<Store> GetStoreCollection() {
@@ -66,7 +67,7 @@ namespace CapWatchBackend.DataAccess.MongoDB {
 
     public IMongoCollection<StoreType> GetTypeCollection() {
       try {
-        return _database.GetCollection<StoreType>("types").WithWriteConcern(WriteConcern.WMajority);
+        return _database.GetCollection<StoreType>("storeTypes").WithWriteConcern(WriteConcern.WMajority);
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
