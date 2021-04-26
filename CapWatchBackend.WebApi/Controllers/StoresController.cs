@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
+using CapWatchBackend.WebApi.Hubs;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +15,12 @@ namespace CapWatchBackend.WebApi.Controllers {
   public class StoresController : ControllerBase {
     private readonly IStoreHandler _handler;
     private readonly IMapper _mapper;
+    private readonly IHubContext<StoresHub> _hubContext;
 
-    public StoresController(IStoreHandler handler, IMapper mapper) {
+    public StoresController(IStoreHandler handler, IMapper mapper, IHubContext<StoresHub> hubContext) {
       _handler = handler;
       _mapper = mapper;
+      _hubContext = hubContext;
     }
 
     [HttpGet]
@@ -37,6 +41,7 @@ namespace CapWatchBackend.WebApi.Controllers {
     public async Task<IActionResult> UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
       await _handler.UpdateStoreAsync(store);
+      await Notify("Update", store);
       return Ok();
     }
 
@@ -45,7 +50,13 @@ namespace CapWatchBackend.WebApi.Controllers {
       var store = _mapper.Map<Store>(model);
       await _handler.AddStoreAsync(store);
       var result = _mapper.Map<NewStoreResponseModel>(store);
+      await Notify("New", store);
       return Ok(result);
+    }
+
+    private async Task Notify(string method, Store store) {
+      var result = _mapper.Map<StoreOverviewModel>(store);
+      await _hubContext.Clients.All.SendAsync(method, result);
     }
   }
 }

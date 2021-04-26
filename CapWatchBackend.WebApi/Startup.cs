@@ -3,6 +3,7 @@ using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.DataAccess.MongoDB;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.WebApi.ActionFilter;
+using CapWatchBackend.WebApi.Hubs;
 using CapWatchBackend.WebApi.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,6 +34,7 @@ namespace CapWatchBackend.WebApi {
 
       RegisterDependencies(services);
 
+      services.AddSignalR();
       services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
 
       services.AddAutoMapper(typeof(MapperProfile));
@@ -60,6 +62,7 @@ namespace CapWatchBackend.WebApi {
 
       app.UseEndpoints(endpoints => {
         endpoints.MapControllers();
+        endpoints.MapHub<StoresHub>("/storesHub");
       });
     }
 
