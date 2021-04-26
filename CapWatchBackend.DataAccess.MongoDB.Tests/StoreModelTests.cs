@@ -11,7 +11,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
 
     StoreRepository sm;
     public StoreModelTests() {
-      sm = new StoreRepository("mongodb://capwusr:capwusr123@152.96.56.34:27018/admin");
+      sm = new StoreRepository("mongodb://capwusr:capwusr123@localhost:27017/admin");
       sm.DeleteAllStores();
     }
 
