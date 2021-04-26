@@ -103,12 +103,10 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter, Func<Store, int> ordering, int orderBy) {
+    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter) {
       try {
         return Task.Factory.StartNew(() => {
-          return (IEnumerable<Store>)_storesCol.AsQueryable()
-          .Where(filter)
-          .OrderBy(ordering, (OrderByDirection)orderBy);
+          return _storesCol.AsQueryable().Where(filter);
         });
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
