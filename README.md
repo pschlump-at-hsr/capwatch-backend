@@ -41,3 +41,11 @@ The current state of the Code Quality for the develop Branch can be viewed at th
 To check SonarLint conformity the extension *SonarLint for Visual Studio 2019* needs to be installed via Extensions -> Manage Extensions -> Online -> Search for the extension -> Install -> Restart Visual Studio
 
 To check the code right click the Solution in the Solution Explorer -> Analyze and Code Cleanup -> Run Code Analysis on Solution => The results of the analysis are displayed in the *Error List* window (make sure to display Warnings and Messages in addition to Errors)
+
+## MongoDB Credentials
+
+For the dev enviroment you have to add the passwords manually at the beginning of the init-mongo.js File at /CapWatchBackend.DataAccess.MongoDB/images/docker-entrypoint-initdb.d/init-mongo.js
+
+`var MONGODB_ADMINPASSWORD = ${MONGODB_ADMINPASSWORD};`  replace the ${MONGODB_ADMINPASSWORD} with the password.
+
+You can lookup the passwords and usernames in Gitlab capwatch-backend project -> settings -> CI/CD -> Variables.

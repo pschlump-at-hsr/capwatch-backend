@@ -34,6 +34,10 @@ Build:
       --build-arg VCS_URL=$CI_PROJECT_URL
       --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
       --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      --echo 'var MONGODB_ADMINPASSWORD = ${MONGODB_ADMINPASSWORD};'| cat - ${MONGODB_PWD} > temp && mv temp ${MONGODB_PWD}
+      --echo 'var MONGODB_ADMINUSER = ${MONGODB_ADMINUSER};'| cat - ${MONGODB_PWD} > temp && mv temp ${MONGODB_PWD}
+      --echo 'var MONGODB_USERNAME = ${MONGODB_USERNAME};'| cat - ${MONGODB_PWD} > temp && mv temp ${MONGODB_PWD}
+      --echo 'var MONGODB_USERPASSWORD = ${MONGODB_USERPASSWORD};'| cat - ${MONGODB_PWD} > temp && mv temp ${MONGODB_PWD}
       .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
