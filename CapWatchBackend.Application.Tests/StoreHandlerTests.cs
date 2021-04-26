@@ -67,10 +67,10 @@ namespace CapWatchBackend.ApplicationTests {
     [InlineData("600", "00000000-0000-0000-0000-000000000006")]
     public async Task TestGetStoresFilterWorksForAllExpectedFields(string filter, string guidShouldBe) {
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStores(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
+      A.CallTo(() => repository.GetStoresAsync(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
 
       var storeHandler = new StoreHandler(repository);
-      var stores = await storeHandler.GetStores(filter);
+      var stores = await storeHandler.GetStoresAsync(filter);
 
       stores.FirstOrDefault().Id.Should().Be(Guid.Parse(guidShouldBe));
     }
@@ -78,10 +78,10 @@ namespace CapWatchBackend.ApplicationTests {
     [Fact]
     public async Task TestGetStoresFilterAppliesToMoreThanOne() {
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStores(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
+      A.CallTo(() => repository.GetStoresAsync(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
 
       var storeHandler = new StoreHandler(repository);
-      var stores = await storeHandler.GetStores("00");
+      var stores = await storeHandler.GetStoresAsync("00");
 
       stores.Count().Should().Be(6);
       stores.Any(store => store.Id == Guid.Parse("00000000-0000-0000-0000-000000000001")).Should().BeTrue();
@@ -95,7 +95,7 @@ namespace CapWatchBackend.ApplicationTests {
       stores.Any(store => store.Id == Guid.Parse("00000000-0000-0000-0000-000000000009")).Should().BeTrue();
     }
 
-    private IList<Store> GetStoreListForGetStoresTest() {
+    private static IList<Store> GetStoreListForGetStoresTest() {
       return new List<Store> {
         new Store{ Id = Guid.Parse("00000000-0000-0000-0000-000000000001"), City = "001", Name = "", Street = "" },
         new Store{ Id = Guid.Parse("00000000-0000-0000-0000-000000000002"), City = "020", Name = "", Street = "" },
