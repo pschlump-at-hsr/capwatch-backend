@@ -1,11 +1,10 @@
-﻿using CapWatchBackend.Domain.Entities;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
   public class StoreModel {
     [Required]
-    public int Id { get; set; }
+    public string Id { get; set; }
     [Required]
     public string Name { get; set; }
     [Required]
@@ -22,6 +21,8 @@ namespace CapWatchBackend.WebApi.Models {
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
     [Required]
-    public String Secret { get; set; }
+    public string Secret { get; set; }
+    [Required]
+    public StoreTypeModel StoreType { get; set; }
   }
 }

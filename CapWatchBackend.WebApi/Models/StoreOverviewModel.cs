@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CapWatchBackend.Domain.Entities;
 
-namespace CapWatchBackend.Domain.Entities {
-  public class Store : IEntity {
-    public Guid Id { get; set; }
+namespace CapWatchBackend.WebApi.Models {
+  public class StoreOverviewModel {
+    public string Id { get; set; }
     public string Name { get; set; }
     public string Street { get; set; }
     public string ZipCode { get; set; }
@@ -10,7 +10,6 @@ namespace CapWatchBackend.Domain.Entities {
     public int MaxCapacity { get; set; }
     public int CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
-    public Guid Secret { get; set; }
     public StoreType StoreType { get; set; }
   }
 }

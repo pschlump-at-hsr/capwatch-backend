@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 
 namespace CapWatchBackend.WebApi.Models {
-  public class StoreNew {
+  public class NewStoreModel {
 
     [Required]
     public string Name { get; set; }
@@ -19,5 +15,7 @@ namespace CapWatchBackend.WebApi.Models {
     [Range(1, int.MaxValue)]
     public int? MaxCapacity { get; set; }
     public byte[] Logo { get; set; }
+    [Required]
+    public StoreTypeModel StoreType { get; set; }
   }
 }

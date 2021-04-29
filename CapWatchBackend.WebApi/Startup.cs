@@ -1,7 +1,9 @@
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Application.Repositories;
+using CapWatchBackend.DataAccess.MongoDB;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.WebApi.ActionFilter;
+using CapWatchBackend.WebApi.Hubs;
 using CapWatchBackend.WebApi.Mapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,12 +20,12 @@ namespace CapWatchBackend.WebApi {
 
     public IConfiguration Configuration { get; }
 
-    public string CorsOrigins = "allowDev";
+    private readonly string _corsOrigins = "allowDev";
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services) {
       services.AddCors(options => {
-        options.AddPolicy(CorsOrigins, builder => {
+        options.AddPolicy(_corsOrigins, builder => {
           builder.AllowAnyOrigin()
           .AllowAnyHeader()
           .AllowAnyMethod();
@@ -32,23 +34,24 @@ namespace CapWatchBackend.WebApi {
 
       RegisterDependencies(services);
 
+      services.AddSignalR();
       services.AddControllers(options => options.Filters.Add(typeof(ExceptionFilter)));
 
       services.AddAutoMapper(typeof(MapperProfile));
 
-      services.AddSwaggerGen(c => {
-        c.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });
+      services.AddSwaggerGen(options => {
+        options.SwaggerDoc("v1", new OpenApiInfo { Title = "CapWatchBackend.WebApi", Version = "v1" });
       });
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
 
-      app.UseCors(CorsOrigins);
+      app.UseCors(_corsOrigins);
 
       if (env.IsDevelopment()) {
         app.UseSwagger();
-        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CapWatchBackend.WebApi v1"));
+        app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "CapWatchBackend.WebApi v1"));
       }
 
       app.UseHttpsRedirection();
@@ -59,13 +62,14 @@ namespace CapWatchBackend.WebApi {
 
       app.UseEndpoints(endpoints => {
         endpoints.MapControllers();
+        endpoints.MapHub<StoresHub>("/storesHub");
       });
     }
 
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();
-      services.Configure<ConfigureDatabase>(Configuration.GetSection(nameof(ConfigureDatabase)));
+      services.Configure<DatabaseConfiguration>(Configuration.GetSection(nameof(DatabaseConfiguration)));
     }
   }
 }

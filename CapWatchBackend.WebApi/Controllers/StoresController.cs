@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using CapWatchBackend.Application.Exceptions;
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Domain.Entities;
+using CapWatchBackend.WebApi.Hubs;
 using CapWatchBackend.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Controllers {
   [ApiController]
@@ -16,48 +15,48 @@ namespace CapWatchBackend.WebApi.Controllers {
   public class StoresController : ControllerBase {
     private readonly IStoreHandler _handler;
     private readonly IMapper _mapper;
+    private readonly IHubContext<StoresHub> _hubContext;
 
-    public StoresController(ILogger<StoresController> logger, IStoreHandler handler, IMapper mapper) {
+    public StoresController(IStoreHandler handler, IMapper mapper, IHubContext<StoresHub> hubContext) {
       _handler = handler;
       _mapper = mapper;
+      _hubContext = hubContext;
     }
 
-    // todo Christoph 2021.04.15: Implement Type in Backend (Pseudodata for Frontend)
     [HttpGet]
-    public IActionResult GetStores() {
-      var stores = _handler.GetStores();
-      var result = stores.Select(store => _mapper.Map<StoreOverview>(store));
-      var type = new StoreType() { Description = "Detailhandel" };
-      var tmpRes = new List<StoreOverview>();
-      foreach (var store in result) {
-        store.Type = type;
-        tmpRes.Add(store);
-      }
-      return Ok(tmpRes);
+    public async Task<IActionResult> GetStores(string filter = null) {
+      var stores = filter != null ? await _handler.GetStoresAsync(filter) : await _handler.GetStoresAsync();
+      var result = stores.Select(store => _mapper.Map<StoreOverviewModel>(store));
+      return Ok(result);
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetStores(int id) {
-      var store = _handler.GetStore(id);
-      var result = _mapper.Map<StoreOverview>(store);
-      var type = new StoreType() { Description = "Detailhandel" };
-      result.Type = type;
+    public async Task<IActionResult> GetStore(Guid id) {
+      var store = await _handler.GetStoreAsync(id);
+      var result = _mapper.Map<StoreOverviewModel>(store);
       return Ok(result);
     }
 
     [HttpPatch]
-    public IActionResult UpdateStores(StoreModel model) {
+    public async Task<IActionResult> UpdateStores(StoreModel model) {
       var store = _mapper.Map<Store>(model);
-      _handler.UpdateStore(store);
+      await _handler.UpdateStoreAsync(store);
+      await Notify("Update", store);
       return Ok();
     }
 
     [HttpPost]
-    public IActionResult PostStores(StoreNew model) {
+    public async Task<IActionResult> PostStores(NewStoreModel model) {
       var store = _mapper.Map<Store>(model);
-      _handler.AddStore(store);
-      var result = _mapper.Map<StoreNewResponse>(store);
+      await _handler.AddStoreAsync(store);
+      var result = _mapper.Map<NewStoreResponseModel>(store);
+      await Notify("New", store);
       return Ok(result);
+    }
+
+    private async Task Notify(string method, Store store) {
+      var result = _mapper.Map<StoreOverviewModel>(store);
+      await _hubContext.Clients.All.SendAsync(method, result);
     }
   }
 }

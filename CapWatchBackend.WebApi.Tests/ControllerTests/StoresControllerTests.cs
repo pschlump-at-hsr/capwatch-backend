@@ -1,14 +1,13 @@
-using CapWatchBackend.Domain.Entities;
 using CapWatchBackend.WebApi.Models;
 using CapWatchBackend.WebApi.Tests.Fakes;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace CapWatchBackend.WebApi.Tests.ControllerTests {
@@ -26,14 +25,14 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestControllerWorks() {
+    public async Task TestControllerWorks() {
       var response = await _client.GetAsync("stores");
       response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
-    public async void TestGetStores() {
-      HttpResponseMessage response = await _client.GetAsync("stores");
+    public async Task TestGetStores() {
+      HttpResponseMessage response = _client.GetAsync("stores").Result;
       var result = await response.Content.ReadAsStringAsync();
       result.Should().Contain("Ikea");
       result.Should().Contain("Zoo Zürich");
@@ -42,26 +41,26 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestGetStoreById() {
-      HttpResponseMessage response = await _client.GetAsync("stores/1");
+    public async Task TestGetStoreById() {
+      HttpResponseMessage response = await _client.GetAsync("stores/9c9cee44-c839-48f2-b54e-235d95fe5d7f");
       await response.Content.ReadAsStringAsync();
       response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 
     [Fact]
-    public async void TestInsertStore() {
-      var newStore = new StoreNew() { Name = "Ikea", Street = "Zürcherstrasse 460" , ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201};
+    public async Task TestInsertStore() {
+      var newStore = new NewStoreModel() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, StoreType = new StoreTypeModel { Id = "c73e9c5f-de5c-479a-b116-7ee1b93ab4f9", Description = "Detailhändler" } };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
       var result = await response.Content.ReadAsStringAsync();
-      result.Should().Contain("\"id\":10");
+      result.Should().Contain("\"id\":\"9c9cee44-c839-48f2-b54e-246d95fe5d7f\"");
       result.Should().Contain("\"secret\":\"9c9cee44-c839-48f2-b54e-236d95fe5d7f\"");
     }
 
     [Fact]
-    public async void TestInsertStoreNoName() {
-      var newStore = new StoreNew() { Name = null, Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201 };
+    public async Task TestInsertStoreNoName() {
+      var newStore = new NewStoreModel() { Name = null, Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201 };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
@@ -71,8 +70,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestInsertStoreNoStreet() {
-      var newStore = new StoreNew() { Name = "Ikea", Street = null, ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201 };
+    public async Task TestInsertStoreNoStreet() {
+      var newStore = new NewStoreModel() { Name = "Ikea", Street = null, ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201 };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
@@ -82,8 +81,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestInsertStoreNoZipCode() {
-      var newStore = new StoreNew() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = null, City = "St. Gallen", MaxCapacity = 201 };
+    public async Task TestInsertStoreNoZipCode() {
+      var newStore = new NewStoreModel() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = null, City = "St. Gallen", MaxCapacity = 201 };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
@@ -94,8 +93,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
 
 
     [Fact]
-    public async void TestInsertStoreNoCity() {
-      var newStore = new StoreNew() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = null, MaxCapacity = 201 };
+    public async Task TestInsertStoreNoCity() {
+      var newStore = new NewStoreModel() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = null, MaxCapacity = 201 };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
@@ -105,8 +104,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestInsertStoreMaxCapacityToLow() {
-      var newStore = new StoreNew() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 0 };
+    public async Task TestInsertStoreMaxCapacityToLow() {
+      var newStore = new NewStoreModel() { Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 0 };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PostAsync("stores", content);
@@ -116,8 +115,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStore() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStore() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f", StoreType = new StoreTypeModel { Id = "c73e9c5f-de5c-479a-b116-7ee1b93ab4f9", Description = "Detailhändler" } };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
@@ -126,8 +125,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreNoName() {
-      var newStore = new StoreModel() { Id = 1, Name = null, Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStoreNoName() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = null, Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
@@ -137,8 +136,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreNoStreet() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = null, ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStoreNoStreet() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = "Ikea", Street = null, ZipCode = "9015", City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
@@ -148,8 +147,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreNoZipCode() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = null, City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStoreNoZipCode() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = null, City = "St. Gallen", MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
@@ -159,8 +158,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreNoCity() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = null, MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStoreNoCity() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = null, MaxCapacity = 201, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);
@@ -170,8 +169,8 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
-    public async void TestUpdateStoreMaxCapacityToLow() {
-      var newStore = new StoreModel() { Id = 1, Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 0, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
+    public async Task TestUpdateStoreMaxCapacityToLow() {
+      var newStore = new StoreModel() { Id = "9c9cee44-c839-48f1-b54e-237d95fe5d7f", Name = "Ikea", Street = "Zürcherstrasse 460", ZipCode = "9015", City = "St. Gallen", MaxCapacity = 0, CurrentCapacity = 50, Secret = "9c9cee44-c839-48f2-b54e-236d95fe5d7f" };
       var json = JsonConvert.SerializeObject(newStore);
       var content = new StringContent(json, Encoding.UTF8, "application/json");
       HttpResponseMessage response = await _client.PatchAsync("stores", content);

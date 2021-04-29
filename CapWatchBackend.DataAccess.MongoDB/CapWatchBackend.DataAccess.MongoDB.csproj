@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CapWatchBackend.Application\CapWatchBackend.Application.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
 	<PackageReference Include="MongoDB.Driver" Version="2.12.2" />
 	<PackageReference Include="morelinq" Version="3.3.2" />
