@@ -3,12 +3,15 @@ variables:
   SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
-  TEST_DIR: "CapWatchBackend.WebApi.Tests"
+  TEST_DIR_1: "CapWatchBackend.WebApi.Tests"
+  TEST_DIR_2: "CapWatchBackend.Application.Tests"
+  Code_Coverage: "Code Coverage"
 
 image: $DOCKER_IMAGE_DOCKER
 
 stages:
   - build
+  - sonarqube-build
   - sonarqube-check
   - test
   - tag-develop
@@ -37,44 +40,51 @@ Build:
       .
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
-Sonarqube:
-  stage: sonarqube-check
-  image:
-    name: sonarsource/sonar-scanner-cli:4.6
+Sonarqube-Build:
+   stage: sonarqube-build
+   script: 
+      - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+      - docker pull $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG || true
+      # The built image is tagged locally with the commit SHA
+      - >
+        docker build
+        --pull
+        --file Dockerfile.dev
+        --build-arg VCS_REF=$CI_COMMIT_SHA
+        --build-arg VCS_URL=$CI_PROJECT_URL
+        --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+        --tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+        .
+      - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+   only: ['merge_requests', 'develop', 'master']
+
+Sonarqube-Check:
+   stage: sonarqube-check
+   image: 
+    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
     entrypoint: [""]
-  services:
-  - docker:dind
-  variables:
-    # Defines the location of the analysis task cache
-    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
-    # Tells git to fetch all the branches of the project, required by the analysis task
-    GIT_DEPTH: "0"
-  cache:
-    key: "${CI_JOB_NAME}"
-    paths:
-      - .sonar/cache
-  script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.host.url="${SONARQUBE_HOST}" -Dsonar.login="${SONARQUBE_TOKEN}"
-  allow_failure: true
+   script:
+      - "dotnet tool install --global dotnet-sonarscanner"
+      - "export PATH=$PATH:/root/.dotnet/tools"
+      - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
+      - "dotnet build CapWatchBackend.sln"
+      - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
+   allow_failure: true
+   only: ['merge_requests', 'develop', 'master']
+
+
+Test:
+  stage: test
+  image:
+    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+    entrypoint: [""]
   only: ['merge_requests', 'develop', 'master']
-
-# TODO fix  failing Test stage
-#   Problem ideas: 
-#   - stdin out not true
-#   - entrypoint have to be overwritten => this is causing an error "sh: 3: set: Illegal option -o pipefail"
-
-#Test:
-#  stage: test
-#  image:
-#    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-#    entrypoint: ["/bin/bash", "-c"]
-#  only: ['merge_requests', 'develop', 'master']
-#  script:
-#    - "cd $TEST_DIR"
-#    - "dotnet test"
-
-
-# TODO add quality gates (sonarqube) for only: ['merge_requests', 'develop', 'master']
+  allow_failure: true
+  script:
+    - "cd $TEST_DIR_1"
+    - "dotnet test"
+    - "cd ../${TEST_DIR_2}"
+    - "dotnet test"
 
 
 Tag develop:
