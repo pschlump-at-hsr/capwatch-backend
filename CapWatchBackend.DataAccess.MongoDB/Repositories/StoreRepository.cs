@@ -34,10 +34,6 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       _typesCol = capWatchDbo.GetTypeCollection();
     }
 
-    public bool IsValidType(StoreType storeType) {
-      return _typesCol.AsQueryable().Any(type => type.Id == storeType.Id);
-    }
-
     public async Task AddStoreAsync(Store store) {
       try {
         if (IsValidType(store.StoreType)) {
@@ -134,11 +130,14 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
 
     public async Task DeleteStoreAsync(Store store) {
       try {
-        await _storesCol.DeleteManyAsync(new BsonDocument("storeId", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
+        await _storesCol.DeleteManyAsync(new BsonDocument("_id", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
+    private bool IsValidType(StoreType storeType) {
+      return _typesCol.AsQueryable().Any(type => type.Id == storeType.Id);
+    }
   }
 }

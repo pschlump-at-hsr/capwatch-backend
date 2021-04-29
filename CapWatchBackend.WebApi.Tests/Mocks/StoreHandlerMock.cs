@@ -2,6 +2,7 @@
 using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CapWatchBackend.WebApi.Tests.Mocks {
@@ -30,7 +31,8 @@ namespace CapWatchBackend.WebApi.Tests.Mocks {
     }
 
     public Task<IEnumerable<Store>> GetStoresAsync(string filter) {
-      throw new NotImplementedException();
+      var stores = GetStores();
+      return Task.Factory.StartNew(() => { return stores.Where(store => store.Name.Contains(filter)); });
     }
 
     public Task UpdateStoreAsync(Store store) {

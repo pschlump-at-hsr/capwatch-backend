@@ -41,6 +41,16 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
+    public async Task TestGetStoresFiltered() {
+      HttpResponseMessage response = _client.GetAsync("stores?filter=Schloss").Result;
+      var result = await response.Content.ReadAsStringAsync();
+
+      result.Should().NotContain("Ikea");
+      result.Should().NotContain("Zoo Zuerich");
+      result.Should().Contain("Polenmuseum - Schloss Rapperswil");
+    }
+
+    [Fact]
     public async Task TestGetStoreById() {
       HttpResponseMessage response = await _client.GetAsync("stores/10000000-0000-0000-0000-000000000000");
       await response.Content.ReadAsStringAsync();
@@ -98,6 +108,14 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
       result.Should().Contain("The field MaxCapacity must be between 1 and 2147483647.");
     }
 
+    [Fact]
+    public void TestInsertStoreNoStoreType() {
+      var newStore = GetNewStoreModel();
+      newStore.StoreType = null;
+      var result = InsertStore(newStore, HttpStatusCode.BadRequest);
+      result.Should().Contain("The StoreType field is required.");
+    }
+
     private static NewStoreModel GetNewStoreModel() {
       return new NewStoreModel() {
         Name = "Ikea",
@@ -133,6 +151,14 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
+    public void TestUpdateStoreNoId() {
+      var store = GetStoreModel();
+      store.Id = null;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The Id field is required.");
+    }
+
+    [Fact]
     public void TestUpdateStoreNoName() {
       var store = GetStoreModel();
       store.Name = null;
@@ -165,11 +191,51 @@ namespace CapWatchBackend.WebApi.Tests.ControllerTests {
     }
 
     [Fact]
+    public void TestUpdateStoreNoMaxCapacity() {
+      var store = GetStoreModel();
+      store.MaxCapacity = null;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The MaxCapacity field is required.");
+    }
+
+    [Fact]
     public void TestUpdateStoreMaxCapacityToLow() {
       var store = GetStoreModel();
       store.MaxCapacity = 0;
       var result = UpdateStore(store, HttpStatusCode.BadRequest);
       result.Should().Contain("The field MaxCapacity must be between 1 and 2147483647.");
+    }
+
+    [Fact]
+    public void TestUpdateStoreNoCurrentCapacity() {
+      var store = GetStoreModel();
+      store.CurrentCapacity = null;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The CurrentCapacity field is required.");
+    }
+
+    [Fact]
+    public void TestUpdateStoreCurrentCapacityToLow() {
+      var store = GetStoreModel();
+      store.CurrentCapacity = -1;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The field CurrentCapacity must be between 0 and 2147483647.");
+    }
+
+    [Fact]
+    public void TestUpdateStoreNoSecret() {
+      var store = GetStoreModel();
+      store.Secret = null;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The Secret field is required.");
+    }
+
+    [Fact]
+    public void TestUpdateStoreNoStoreType() {
+      var store = GetStoreModel();
+      store.StoreType = null;
+      var result = UpdateStore(store, HttpStatusCode.BadRequest);
+      result.Should().Contain("The StoreType field is required.");
     }
 
     private static StoreModel GetStoreModel() {

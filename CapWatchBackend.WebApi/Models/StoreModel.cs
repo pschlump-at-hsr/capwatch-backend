@@ -15,10 +15,10 @@ namespace CapWatchBackend.WebApi.Models {
     public string City { get; set; }
     [Required]
     [Range(1, int.MaxValue)]
-    public int MaxCapacity { get; set; }
+    public int? MaxCapacity { get; set; }
     [Required]
     [Range(0, int.MaxValue)]
-    public int CurrentCapacity { get; set; }
+    public int? CurrentCapacity { get; set; }
     public byte[] Logo { get; set; }
     [Required]
     public string Secret { get; set; }

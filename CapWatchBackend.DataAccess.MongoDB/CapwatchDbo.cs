@@ -30,6 +30,22 @@ namespace CapWatchBackend.DataAccess.MongoDB {
       return _instance;
     }
 
+    public IMongoCollection<Store> GetStoreCollection() {
+      try {
+        return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
+      } catch (MongoClientException e) {
+        throw new RepositoryException(e.Message, e);
+      }
+    }
+
+    public IMongoCollection<StoreType> GetTypeCollection() {
+      try {
+        return _database.GetCollection<StoreType>("storeTypes").WithWriteConcern(WriteConcern.WMajority);
+      } catch (MongoClientException e) {
+        throw new RepositoryException(e.Message, e);
+      }
+    }
+
     private void SetupDatabaseMapping() {
       //Due to a bug this obsolete method is necessary
 #pragma warning disable CS0618 // Type or member is obsolete
@@ -55,22 +71,6 @@ namespace CapWatchBackend.DataAccess.MongoDB {
          map.MapProperty(store => store.StoreType).SetElementName("storeType").SetSerializer(new BsonClassMapSerializer<StoreType>(BsonClassMap.LookupClassMap(typeof(StoreType))));
        });
 
-    }
-
-    public IMongoCollection<Store> GetStoreCollection() {
-      try {
-        return _database.GetCollection<Store>("stores").WithWriteConcern(WriteConcern.WMajority);
-      } catch (MongoClientException e) {
-        throw new RepositoryException(e.Message, e);
-      }
-    }
-
-    public IMongoCollection<StoreType> GetTypeCollection() {
-      try {
-        return _database.GetCollection<StoreType>("storeTypes").WithWriteConcern(WriteConcern.WMajority);
-      } catch (MongoClientException e) {
-        throw new RepositoryException(e.Message, e);
-      }
     }
   }
 }
