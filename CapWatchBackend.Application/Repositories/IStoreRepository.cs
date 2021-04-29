@@ -15,7 +15,7 @@ namespace CapWatchBackend.Application.Repositories {
     public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter);
     public Task<Store> GetStoreAsync(Guid id);
 
-    public void DeleteAllStoresAsync();
-    public void DeleteStoreAsync(Store store);
+    public Task DeleteAllStoresAsync();
+    public Task DeleteStoreAsync(Store store);
   }
 }

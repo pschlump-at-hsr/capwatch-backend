@@ -49,8 +49,8 @@ namespace CapWatchBackend.WebApi.Controllers {
     public async Task<IActionResult> PostStores(NewStoreModel model) {
       var store = _mapper.Map<Store>(model);
       await _handler.AddStoreAsync(store);
-      var result = _mapper.Map<NewStoreResponseModel>(store);
       await Notify("New", store);
+      var result = _mapper.Map<NewStoreResponseModel>(store);
       return Ok(result);
     }
 
