@@ -97,12 +97,12 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       await _storeRepository.AddStoresAsync(stores);
 
       var storesAfterInsert = await _storeRepository.GetStoresAsync();
-      storesAfterInsert.FirstOrDefault(x => x.Name.Equals("Ikea")).Name = "Invalid";
+      storesAfterInsert.FirstOrDefault(store => store.Name.Equals("Ikea")).Name = "Invalid";
 
       await _storeRepository.UpdateStoresAsync(storesAfterInsert);
 
       var storesAfterUpdate = await _storeRepository.GetStoresAsync();
-      storesAfterUpdate.Any(x => x.Name.Equals("Ikea")).Should().BeFalse();
+      storesAfterUpdate.Any(store => store.Name.Equals("Ikea")).Should().BeFalse();
     }
 
     [Fact]
@@ -112,7 +112,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       await _storeRepository.AddStoresAsync(stores);
 
       var storesAfterInsert = await _storeRepository.GetStoresAsync();
-      storesAfterInsert.FirstOrDefault(x => x.Name.Equals("Ikea")).StoreType.Id = _invalidStoreTypeId;
+      storesAfterInsert.FirstOrDefault(store => store.Name.Equals("Ikea")).StoreType.Id = _invalidStoreTypeId;
 
       _storeRepository.Invoking(async repository => await repository.UpdateStoresAsync(storesAfterInsert)).Should().Throw<StoreTypeInvalidException>();
     }
@@ -133,7 +133,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
     public async Task TestGetStoresAsyncFiltered() {
       await _storeRepository.AddStoresAsync(GetTestStores());
 
-      bool filterFunction(Store store) => store.Name.Equals("Ikea");
+      static bool filterFunction(Store store) => store.Name.Equals("Ikea");
 
       var stores = await _storeRepository.GetStoresAsync(filterFunction);
 
@@ -145,7 +145,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
     public async Task TestGetStoresAsyncFilteredNoResult() {
       await _storeRepository.AddStoresAsync(GetTestStores());
 
-      bool filterFunction(Store store) => store.Name.Equals("Invalid");
+      static bool filterFunction(Store store) => store.Name.Equals("Invalid");
 
       var stores = await _storeRepository.GetStoresAsync(filterFunction);
 

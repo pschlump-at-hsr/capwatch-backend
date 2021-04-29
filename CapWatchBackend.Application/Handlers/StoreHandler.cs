@@ -22,7 +22,7 @@ namespace CapWatchBackend.Application.Handlers {
     }
 
     public Task UpdateStoreAsync(Store store) {
-      if (!_repository.GetStoreAsync(store.Id).Result.Secret.Equals(store.Secret)) {
+      if (!_repository.GetStoreAsync(store.Id).GetAwaiter().GetResult().Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
