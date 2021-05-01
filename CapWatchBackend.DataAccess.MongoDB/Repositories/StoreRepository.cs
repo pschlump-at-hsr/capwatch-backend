@@ -12,11 +12,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
   public sealed class StoreRepository : IStoreRepository {
     private readonly IMongoCollection<Store> _storesCol;
     private readonly IMongoCollection<StoreType> _typesCol;
+
     public StoreRepository(IOptions<DatabaseConfiguration> options, ILogger<StoreRepository> logger) {
       try {
         var capWatchDbo = CapwatchDbo.GetInstance(options.Value.ConnectionString);
@@ -24,6 +24,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
         _typesCol = capWatchDbo.GetTypeCollection();
       } catch (RepositoryException e) {
         logger.LogError(e, e.Message);
+        throw;
       }
     }
 
@@ -33,15 +34,11 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       _typesCol = capWatchDbo.GetTypeCollection();
     }
 
-    public bool IsValidType(StoreType storeType) {
-      return _typesCol.AsQueryable().Any(type => type.Id == storeType.Id);
-    }
-
-    public Task AddStoreAsync(Store store) {
+    public async Task AddStoreAsync(Store store) {
       try {
         if (IsValidType(store.StoreType)) {
           store.Id = (Guid)GuidGenerator.Instance.GenerateId(_storesCol, store);
-          return _storesCol.InsertOneAsync(store);
+          await _storesCol.InsertOneAsync(store);
         } else {
           throw new StoreTypeInvalidException();
         }
@@ -78,7 +75,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
     }
 
     public async Task UpdateStoresAsync(IEnumerable<Store> stores) {
-      List<Task> tasks = new List<Task>();
+      var tasks = new List<Task>();
       try {
         foreach (var store in stores) {
           if (IsValidType(store.StoreType)) {
@@ -93,9 +90,9 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync() {
+    public async Task<IEnumerable<Store>> GetStoresAsync() {
       try {
-        return Task.Factory.StartNew(() => {
+        return await Task.Factory.StartNew(() => {
           return (IEnumerable<Store>)_storesCol.Find(FilterDefinition<Store>.Empty).ToList();
         });
       } catch (MongoClientException e) {
@@ -103,9 +100,9 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter) {
+    public async Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter) {
       try {
-        return Task.Factory.StartNew(() => {
+        return await Task.Factory.StartNew(() => {
           return _storesCol.AsQueryable().Where(filter);
         });
       } catch (MongoClientException e) {
@@ -113,9 +110,9 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public Task<Store> GetStoreAsync(Guid id) {
+    public async Task<Store> GetStoreAsync(Guid id) {
       try {
-        return Task.Factory.StartNew(() => {
+        return await Task.Factory.StartNew(() => {
           return _storesCol.AsQueryable().FirstOrDefault(store => store.Id == id);
         });
       } catch (MongoClientException e) {
@@ -123,7 +120,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public async void DeleteAllStoresAsync() {
+    public async Task DeleteAllStoresAsync() {
       try {
         await _storesCol.DeleteManyAsync(FilterDefinition<Store>.Empty);
       } catch (MongoClientException e) {
@@ -131,13 +128,16 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public async void DeleteStoreAsync(Store store) {
+    public async Task DeleteStoreAsync(Store store) {
       try {
-        await _storesCol.DeleteManyAsync(new BsonDocument("storeId", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
+        await _storesCol.DeleteManyAsync(new BsonDocument("_id", new BsonBinaryData(store.Id, GuidRepresentation.Standard)));
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);
       }
     }
 
+    private bool IsValidType(StoreType storeType) {
+      return _typesCol.AsQueryable().Any(type => type.Id == storeType.Id);
+    }
   }
 }

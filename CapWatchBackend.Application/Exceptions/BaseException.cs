@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace CapWatchBackend.Application.Exceptions {
   [Serializable]
   public abstract class BaseException : ApplicationException {
-    public int Status { get; set; } = (int)HttpStatusCode.InternalServerError;
+    public HttpStatusCode Status { get; set; } = HttpStatusCode.InternalServerError;
 
     protected BaseException(string message) : base(message) { }
     protected BaseException(string message, Exception innerException) : base(message, innerException) { }

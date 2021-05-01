@@ -6,7 +6,7 @@ namespace CapWatchBackend.Application.Exceptions {
   [Serializable]
   public class SecretInvalidException : BaseException {
     public SecretInvalidException() : base("Das Secret ist ungültig.") {
-      Status = (int)HttpStatusCode.Unauthorized;
+      Status = HttpStatusCode.Unauthorized;
     }
 
     protected SecretInvalidException(SerializationInfo info, StreamingContext context) : base(info, context) { }

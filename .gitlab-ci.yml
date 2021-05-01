@@ -79,7 +79,7 @@ Test:
     name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
     entrypoint: [""]
   only: ['merge_requests', 'develop', 'master']
-  allow_failure: true
+  allow_failure: false
   script:
     - "cd $TEST_DIR_1"
     - "dotnet test"

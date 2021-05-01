@@ -22,7 +22,7 @@ namespace CapWatchBackend.WebApi.ActionFilter {
     public void OnActionExecuted(ActionExecutedContext context) {
       if (context.Exception is BaseException baseException) {
         context.Result = new ObjectResult(null) {
-          StatusCode = baseException.Status
+          StatusCode = (int)baseException.Status
         };
         context.ExceptionHandled = true;
 
