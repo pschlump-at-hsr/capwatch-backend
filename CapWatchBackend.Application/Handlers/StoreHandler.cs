@@ -21,12 +21,13 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.AddStoreAsync(store);
     }
 
-    public Task UpdateStoreAsync(Store store) {
-      if (!_repository.GetStoreAsync(store.Id).GetAwaiter().GetResult().Secret.Equals(store.Secret)) {
+    public async Task UpdateStoreAsync(Store store) {
+      var existingStore = await _repository.GetStoreAsync(store.Id);
+      if (!existingStore.Secret.Equals(store.Secret)) {
         throw new SecretInvalidException();
       }
 
-      return _repository.UpdateStoreAsync(store);
+      await _repository.UpdateStoreAsync(store);
     }
 
     public Task<IEnumerable<Store>> GetStoresAsync() {
