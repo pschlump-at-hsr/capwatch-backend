@@ -7,7 +7,7 @@ networks:
 services:
   web:
     container_name: capwatch-backend
-    build: .
+    image: registry.gitlab.ost.ch:45023/epj/2021-fs/g03_capwatch/development/capwatch-backend/${DEPLOYMENT_VERSION}
     stdin_open: true
     ports:
       - "8080:80"
