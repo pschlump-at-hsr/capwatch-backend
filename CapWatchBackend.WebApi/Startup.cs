@@ -61,7 +61,7 @@ namespace CapWatchBackend.WebApi {
 
       app.UseEndpoints(endpoints => {
         endpoints.MapControllers();
-        endpoints.MapHub<StoresHub>("/storesHub");
+        endpoints.MapHub<StoresHub>("/storeshub");
       });
     }
 
