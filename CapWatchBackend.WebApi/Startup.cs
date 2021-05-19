@@ -1,6 +1,7 @@
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.DataAccess.MongoDB;
+using CapWatchBackend.DataAccess.MongoDB.DbContext;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.WebApi.ActionFilter;
 using CapWatchBackend.WebApi.Hubs;
@@ -69,6 +70,7 @@ namespace CapWatchBackend.WebApi {
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();
       services.Configure<DatabaseConfiguration>(Configuration.GetSection(nameof(DatabaseConfiguration)));
+      services.AddSingleton<ICapwatchDBContext, CapwatchDBContext>();
     }
   }
 }
