@@ -38,24 +38,6 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       A.CallTo(() => storeCollection.InsertOneAsync(A<Store>._, A<InsertOneOptions>._, default)).MustHaveHappened();
     }
 
-    private IMongoCollection<StoreType> GetFakeStoreTypeCollection(long returnValue = 1) {
-      var collection = A.Fake<IMongoCollection<StoreType>>();
-      A.CallTo(() => collection.CountDocuments(A<FilterDefinition<StoreType>>._, A<CountOptions>._, default)).ReturnsNextFromSequence(returnValue, 1, 1);
-      return collection;
-    }
-
-    private IMongoCollection<Store> GetFakeStoreCollection(IList<Store> findReturnValue = null, Func<Store, bool> filter = null) {
-      var collection = A.Fake<IMongoCollection<Store>>();
-      var asyncCursor = A.Fake<IAsyncCursor<Store>>();
-
-      A.CallTo(() => collection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Returns(asyncCursor);
-
-      A.CallTo(() => asyncCursor.MoveNext(default)).ReturnsNextFromSequence(true, false);
-      A.CallTo(() => asyncCursor.Current).Returns(filter == null ? findReturnValue : findReturnValue.Where(filter));
-
-      return collection;
-    }
-
     [Fact]
     public void TestAddStoreAsyncInvalidStoreType() {
       var store = GetTestStore();
@@ -248,6 +230,132 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       await storeRepository.DeleteStoreAsync(GetTestStore());
 
       A.CallTo(() => storeCollection.DeleteManyAsync(A<FilterDefinition<Store>>._, default)).MustHaveHappened();
+    }
+
+    [Fact]
+    public void TestAddStoreAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.InsertOneAsync(A<Store>._, A<InsertOneOptions>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.AddStoreAsync(GetTestStore())).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestAddStoresAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.InsertManyAsync(A<IEnumerable<Store>>._, A<InsertManyOptions>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.AddStoresAsync(GetTestStores())).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestUpdateStoreAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.UpdateStoreAsync(GetTestStore())).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestUpdateStoresAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.UpdateStoresAsync(GetTestStores())).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestGetStoresAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.GetStoresAsync()).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestGetStoresAsyncFilteredWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.GetStoresAsync((store) => false)).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestGetStoreAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.GetStoreAsync(Guid.Empty)).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestDeleteAllStoresAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.DeleteManyAsync(A<FilterDefinition<Store>>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.DeleteAllStoresAsync()).Should().Throw<RepositoryException>();
+    }
+
+    [Fact]
+    public void TestDeleteStoreAsyncWrapsMongoException() {
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => storeCollection.DeleteManyAsync(A<FilterDefinition<Store>>._, default)).Throws(() => throw new MongoClientException("test exception"));
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+      storeRepository.Invoking(async repository => await repository.DeleteStoreAsync(GetTestStore())).Should().Throw<RepositoryException>();
+    }
+
+    private static IMongoCollection<StoreType> GetFakeStoreTypeCollection(long returnValue = 1) {
+      var collection = A.Fake<IMongoCollection<StoreType>>();
+      A.CallTo(() => collection.CountDocuments(A<FilterDefinition<StoreType>>._, A<CountOptions>._, default)).ReturnsNextFromSequence(returnValue, 1, 1);
+      return collection;
+    }
+
+    private static IMongoCollection<Store> GetFakeStoreCollection(IList<Store> findReturnValue = null, Func<Store, bool> filter = null) {
+      var collection = A.Fake<IMongoCollection<Store>>();
+      var asyncCursor = A.Fake<IAsyncCursor<Store>>();
+
+      A.CallTo(() => collection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Returns(asyncCursor);
+
+      A.CallTo(() => asyncCursor.MoveNext(default)).ReturnsNextFromSequence(true, false);
+      A.CallTo(() => asyncCursor.Current).Returns(filter == null ? findReturnValue : findReturnValue.Where(filter));
+
+      return collection;
     }
 
     private static Store GetTestStore() {

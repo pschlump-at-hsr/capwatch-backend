@@ -6,11 +6,13 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.IdGenerators;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("CapWatchBackend.DataAccess.MongoDB.Tests")]
 [assembly: InternalsVisibleTo("CapWatchBackend.WebApi")]
 namespace CapWatchBackend.DataAccess.MongoDB.DbContext {
+  [ExcludeFromCodeCoverage]
   internal class CapwatchDBContext : ICapwatchDBContext {
 
     private readonly string _storeCollectionName = "stores";

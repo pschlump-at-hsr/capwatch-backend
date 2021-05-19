@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CapWatchBackend.WebApi {
   public class Startup {
@@ -66,6 +67,7 @@ namespace CapWatchBackend.WebApi {
       });
     }
 
+    [ExcludeFromCodeCoverage]
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();

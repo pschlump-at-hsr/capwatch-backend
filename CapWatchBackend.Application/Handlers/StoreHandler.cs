@@ -3,6 +3,7 @@ using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -29,6 +30,7 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.UpdateStoreAsync(store);
     }
 
+    [ExcludeFromCodeCoverage]
     public Task<IEnumerable<Store>> GetStoresAsync() {
       return _repository.GetStoresAsync();
     }
@@ -41,6 +43,7 @@ namespace CapWatchBackend.Application.Handlers {
       return _repository.GetStoresAsync(filterFunction);
     }
 
+    [ExcludeFromCodeCoverage]
     public Task<Store> GetStoreAsync(Guid id) {
       return _repository.GetStoreAsync(id);
     }
