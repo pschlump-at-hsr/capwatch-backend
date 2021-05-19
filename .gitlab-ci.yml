@@ -77,7 +77,6 @@ Sonarqube-Check:
       - "dotnet test ${DB_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/db /p:CoverletOutputFormat=opencover"
       - "reportgenerator -reports:\"${TEST_RESULTS}/db.opencover.xml;${TEST_RESULTS}/api.opencover.xml;${TEST_RESULTS}/app.opencover.xml\" -targetdir:${TEST_RESULTS} -reporttypes:SonarQube"
       - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
-   allow_failure: true
    only: ['merge_requests', 'develop', 'master']
 
 
@@ -87,7 +86,6 @@ Test:
     name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
     entrypoint: [""]
   only: ['merge_requests', 'develop', 'master']
-  allow_failure: false
   script:
     - "dotnet test"
 
