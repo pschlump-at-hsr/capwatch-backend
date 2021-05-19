@@ -1,7 +1,11 @@
 using CapWatchBackend.Application.Exceptions;
+using CapWatchBackend.DataAccess.MongoDB.DbContext;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.Domain.Entities;
+using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,180 +15,239 @@ using Xunit;
 namespace CapWatchBackend.DataAccess.MongoDB.Tests {
 
   public class StoreRepositoryTests {
-    private readonly StoreRepository _storeRepository;
-    private readonly Guid _invalidStoreTypeId = new("00000000-1000-0000-0000-000000000000");
+    private readonly ILogger<StoreRepository> _logger;
 
     public StoreRepositoryTests() {
-      _storeRepository = new StoreRepository("mongodb://capwusr:capwusr123@localhost:27017/admin");
-      _storeRepository.DeleteAllStoresAsync().Wait();
+      _logger = A.Fake<ILogger<StoreRepository>>();
     }
 
     [Fact]
     public async Task TestAddStoreAsync() {
       var store = GetTestStore();
 
-      await _storeRepository.AddStoreAsync(store);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(new List<Store> { store });
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
 
-      store.Id.Should().NotBe(Guid.Empty)
-          .And.Should().NotBeNull();
+      var storeRepository = new StoreRepository(context, _logger);
 
-      store = await _storeRepository.GetStoreAsync(store.Id);
-      store.Name.Should().Be("Botanischer Garten der Universitaet Bern");
+      await storeRepository.AddStoreAsync(store);
+
+      store.Id.Should().NotBe(Guid.Empty).And.Should().NotBeNull();
+      A.CallTo(() => storeCollection.InsertOneAsync(A<Store>._, A<InsertOneOptions>._, default)).MustHaveHappened();
+    }
+
+    private IMongoCollection<StoreType> GetFakeStoreTypeCollection(long returnValue = 1) {
+      var collection = A.Fake<IMongoCollection<StoreType>>();
+      A.CallTo(() => collection.CountDocuments(A<FilterDefinition<StoreType>>._, A<CountOptions>._, default)).ReturnsNextFromSequence(returnValue, 1, 1);
+      return collection;
+    }
+
+    private IMongoCollection<Store> GetFakeStoreCollection(IList<Store> findReturnValue = null, Func<Store, bool> filter = null) {
+      var collection = A.Fake<IMongoCollection<Store>>();
+      var asyncCursor = A.Fake<IAsyncCursor<Store>>();
+
+      A.CallTo(() => collection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Returns(asyncCursor);
+
+      A.CallTo(() => asyncCursor.MoveNext(default)).ReturnsNextFromSequence(true, false);
+      A.CallTo(() => asyncCursor.Current).Returns(filter == null ? findReturnValue : findReturnValue.Where(filter));
+
+      return collection;
     }
 
     [Fact]
     public void TestAddStoreAsyncInvalidStoreType() {
       var store = GetTestStore();
-      store.StoreType.Id = _invalidStoreTypeId;
 
-      _storeRepository.Invoking(async repository => await repository.AddStoreAsync(store)).Should().Throw<StoreTypeInvalidException>();
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection(0));
+
+      var storeRepository = new StoreRepository(context, _logger);
+
+      storeRepository.Invoking(async repository => await repository.AddStoreAsync(store)).Should().Throw<StoreTypeInvalidException>();
+      A.CallTo(() => storeCollection.InsertOneAsync(A<Store>._, A<InsertOneOptions>._, default)).MustNotHaveHappened();
     }
 
     [Fact]
     public async Task TestAddStoresAsync() {
       var stores = GetTestStores();
 
-      await _storeRepository.AddStoresAsync(stores);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
+
+      var storeRepository = new StoreRepository(context, _logger);
+
+      await storeRepository.AddStoresAsync(stores);
 
       stores.Any(store => store.Id == Guid.Empty).Should().BeFalse();
-
-      var storesAfterInsert = await _storeRepository.GetStoresAsync();
-      storesAfterInsert.Any(store => store.Name.Equals("Ikea")).Should().BeTrue();
-      storesAfterInsert.Any(store => store.Name.Equals("Zoo Zuerich")).Should().BeTrue();
-      storesAfterInsert.Any(store => store.Name.Equals("Polenmuseum - Schloss Rapperswil")).Should().BeTrue();
+      A.CallTo(() => storeCollection.InsertManyAsync(A<IList<Store>>._, A<InsertManyOptions>._, default)).MustHaveHappened();
     }
 
     [Fact]
     public void TestAddStoresAsyncInvalidStoreType() {
       var stores = GetTestStores();
-      stores[0].StoreType.Id = _invalidStoreTypeId;
 
-      _storeRepository.Invoking(async repository => await repository.AddStoresAsync(stores)).Should().Throw<StoreTypeInvalidException>();
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection(0));
+
+      var storeRepository = new StoreRepository(context, _logger);
+
+      storeRepository.Invoking(async repository => await repository.AddStoresAsync(stores)).Should().Throw<StoreTypeInvalidException>();
+      A.CallTo(() => storeCollection.InsertManyAsync(A<IList<Store>>._, A<InsertManyOptions>._, default)).MustNotHaveHappened();
     }
 
     [Fact]
     public async Task TestUpdateStoreAsync() {
       var store = GetTestStore();
 
-      await _storeRepository.AddStoreAsync(store);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
 
-      store.Name = "Botanischer Garten St. Gallen";
-      store.Street = "Keine Ahnung";
-      store.ZipCode = "9008";
-      store.City = "St. Gallen";
+      var storeRepository = new StoreRepository(context, _logger);
 
-      await _storeRepository.UpdateStoreAsync(store);
-
-      var storeAfterUpdate = await _storeRepository.GetStoreAsync(store.Id);
-      storeAfterUpdate.Name.Should().Be("Botanischer Garten St. Gallen");
+      await storeRepository.UpdateStoreAsync(store);
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).MustHaveHappened();
     }
 
     [Fact]
-    public async Task TestUpdateStoreAsyncInvalidStoreType() {
+    public void TestUpdateStoreAsyncInvalidStoreType() {
       var store = GetTestStore();
 
-      await _storeRepository.AddStoreAsync(store);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection(0));
 
-      store.StoreType.Id = _invalidStoreTypeId;
+      var storeRepository = new StoreRepository(context, _logger);
 
-      _storeRepository.Invoking(async repository => await repository.UpdateStoreAsync(store)).Should().Throw<StoreTypeInvalidException>();
+      storeRepository.Invoking(async repository => await repository.UpdateStoreAsync(store)).Should().Throw<StoreTypeInvalidException>();
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).MustNotHaveHappened();
     }
 
     [Fact]
     public async Task TestUpdateStoresAsync() {
       var stores = GetTestStores();
 
-      await _storeRepository.AddStoresAsync(stores);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
 
-      var storesAfterInsert = await _storeRepository.GetStoresAsync();
-      storesAfterInsert.FirstOrDefault(store => store.Name.Equals("Ikea")).Name = "Invalid";
+      var storeRepository = new StoreRepository(context, _logger);
 
-      await _storeRepository.UpdateStoresAsync(storesAfterInsert);
-
-      var storesAfterUpdate = await _storeRepository.GetStoresAsync();
-      storesAfterUpdate.Any(store => store.Name.Equals("Ikea")).Should().BeFalse();
+      await storeRepository.UpdateStoresAsync(stores);
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).MustHaveHappened(3, Times.Exactly);
     }
 
     [Fact]
-    public async Task TestUpdateStoresAsyncInvalidStoreType() {
+    public void TestUpdateStoresAsyncInvalidStoreType() {
       var stores = GetTestStores();
 
-      await _storeRepository.AddStoresAsync(stores);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection(0));
 
-      var storesAfterInsert = await _storeRepository.GetStoresAsync();
-      storesAfterInsert.FirstOrDefault(store => store.Name.Equals("Ikea")).StoreType.Id = _invalidStoreTypeId;
+      var storeRepository = new StoreRepository(context, _logger);
 
-      _storeRepository.Invoking(async repository => await repository.UpdateStoresAsync(storesAfterInsert)).Should().Throw<StoreTypeInvalidException>();
+      storeRepository.Invoking(async repository => await repository.UpdateStoresAsync(stores)).Should().Throw<StoreTypeInvalidException>();
+      A.CallTo(() => storeCollection.ReplaceOneAsync(A<FilterDefinition<Store>>._, A<Store>._, A<ReplaceOptions>._, default)).MustNotHaveHappened();
     }
 
     [Fact]
     public async Task TestGetStoresAsync() {
-      await _storeRepository.AddStoresAsync(GetTestStores());
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores());
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+      A.CallTo(() => context.GetTypeCollection()).Returns(GetFakeStoreTypeCollection());
 
-      var stores = await _storeRepository.GetStoresAsync();
+      var storeRepository = new StoreRepository(context, _logger);
+
+      var stores = await storeRepository.GetStoresAsync();
 
       stores.Count().Should().Be(3);
-      foreach (var store in stores) {
-        store.Name.Should().NotBeNullOrEmpty();
-      }
+      A.CallTo(() => storeCollection.FindSync(FilterDefinition<Store>.Empty, A<FindOptions<Store>>._, default)).MustHaveHappened();
     }
 
     [Fact]
     public async Task TestGetStoresAsyncFiltered() {
-      await _storeRepository.AddStoresAsync(GetTestStores());
-
       static bool filterFunction(Store store) => store.Name.Equals("Ikea");
 
-      var stores = await _storeRepository.GetStoresAsync(filterFunction);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores(), filterFunction);
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+
+      var storeRepository = new StoreRepository(context, _logger);
+
+      var stores = await storeRepository.GetStoresAsync(filterFunction);
 
       stores.Count().Should().Be(1);
-      stores.Any(store => store.Street.Equals("Zuercherstrasse 460")).Should().BeTrue();
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).MustHaveHappened();
     }
 
     [Fact]
     public async Task TestGetStoresAsyncFilteredNoResult() {
-      await _storeRepository.AddStoresAsync(GetTestStores());
-
       static bool filterFunction(Store store) => store.Name.Equals("Invalid");
 
-      var stores = await _storeRepository.GetStoresAsync(filterFunction);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(GetTestStores(), filterFunction);
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
+
+      var storeRepository = new StoreRepository(context, _logger);
+
+      var stores = await storeRepository.GetStoresAsync(filterFunction);
 
       stores.Count().Should().Be(0);
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).MustHaveHappened();
     }
 
     [Fact]
     public async Task TestGetStoreAsync() {
-      var stores = GetTestStores();
-      await _storeRepository.AddStoresAsync(stores);
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection(new List<Store> { GetTestStore() });
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
 
-      var store = await _storeRepository.GetStoreAsync(stores.FirstOrDefault(store => store.Name.Equals("Ikea")).Id);
+      var storeRepository = new StoreRepository(context, _logger);
 
-      store.Name.Should().Be("Ikea");
+      var store = await storeRepository.GetStoreAsync(GetTestStore().Id);
+
+      store.Name.Should().Be("Botanischer Garten der Universitaet Bern");
+      A.CallTo(() => storeCollection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).MustHaveHappened();
     }
 
     [Fact]
     public async Task TestDeleteAllStoresAsync() {
-      await _storeRepository.AddStoresAsync(GetTestStores());
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
 
-      var stores = await _storeRepository.GetStoresAsync();
-      stores.Count().Should().Be(3);
+      var storeRepository = new StoreRepository(context, _logger);
 
-      await _storeRepository.DeleteAllStoresAsync();
+      await storeRepository.DeleteAllStoresAsync();
 
-      stores = await _storeRepository.GetStoresAsync();
-      stores.Count().Should().Be(0);
+      A.CallTo(() => storeCollection.DeleteManyAsync(FilterDefinition<Store>.Empty, default)).MustHaveHappened();
     }
 
     [Fact]
     public async Task TestDeleteStoreAsync() {
-      await _storeRepository.AddStoresAsync(GetTestStores());
+      var context = A.Fake<ICapwatchDBContext>();
+      var storeCollection = GetFakeStoreCollection();
+      A.CallTo(() => context.GetStoreCollection()).Returns(storeCollection);
 
-      var stores = await _storeRepository.GetStoresAsync();
-      await _storeRepository.DeleteStoreAsync(stores.FirstOrDefault(store => store.Name.Equals("Ikea")));
+      var storeRepository = new StoreRepository(context, _logger);
 
-      stores = await _storeRepository.GetStoresAsync();
-      stores.Count().Should().Be(2);
-      stores.Any(store => store.Name.Equals("Ikea")).Should().BeFalse();
+      await storeRepository.DeleteStoreAsync(GetTestStore());
+
+      A.CallTo(() => storeCollection.DeleteManyAsync(A<FilterDefinition<Store>>._, default)).MustHaveHappened();
     }
 
     private static Store GetTestStore() {
