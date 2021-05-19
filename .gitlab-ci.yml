@@ -3,8 +3,11 @@ variables:
   SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
   NAME_LATEST_TAG: latest
   NAME_DEVELOP_TAG: develop
-  TEST_DIR_1: "CapWatchBackend.WebApi.Tests"
-  TEST_DIR_2: "CapWatchBackend.Application.Tests"
+  SOLUTION: "CapWatchBackend.sln"
+  TEST_RESULTS: "/root/TestResults"
+  API_TEST_DIR: "CapWatchBackend.Application.Tests"
+  APP_TEST_DIR: "CapWatchBackend.WebApi.Tests"
+  DB_TEST_DIR: "CapWatchBackend.DataAccess.MongoDB.Tests"
   Code_Coverage: "Code Coverage"
 
 image: $DOCKER_IMAGE_DOCKER
@@ -65,9 +68,14 @@ Sonarqube-Check:
     entrypoint: [""]
    script:
       - "dotnet tool install --global dotnet-sonarscanner"
+      - "dotnet tool install --global dotnet-reportgenerator-globaltool"
       - "export PATH=$PATH:/root/.dotnet/tools"
-      - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST}"
-      - "dotnet build CapWatchBackend.sln"
+      - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST} /d:sonar.coverageReportPaths=${TEST_RESULTS}/SonarQube.xml"
+      - "dotnet build ${SOLUTION}"
+      - "dotnet test ${API_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/api /p:CoverletOutputFormat=opencover"
+      - "dotnet test ${APP_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/app /p:CoverletOutputFormat=opencover"
+      - "dotnet test ${DB_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/db /p:CoverletOutputFormat=opencover"
+      - "reportgenerator -reports:\"${TEST_RESULTS}/db.opencover.xml;${TEST_RESULTS}/api.opencover.xml;${TEST_RESULTS}/app.opencover.xml\" -targetdir:${TEST_RESULTS} -reporttypes:SonarQube"
       - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
    allow_failure: true
    only: ['merge_requests', 'develop', 'master']
@@ -81,9 +89,6 @@ Test:
   only: ['merge_requests', 'develop', 'master']
   allow_failure: false
   script:
-    - "cd $TEST_DIR_1"
-    - "dotnet test"
-    - "cd ../${TEST_DIR_2}"
     - "dotnet test"
 
 
