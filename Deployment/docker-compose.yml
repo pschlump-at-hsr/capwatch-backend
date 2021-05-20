@@ -1,0 +1,28 @@
+version: '3'
+
+networks:
+  capwatch:
+    driver: bridge
+
+services:
+  web:
+    container_name: ${CONTAINER_NAME}
+    image: registry.gitlab.ost.ch:45023/epj/2021-fs/g03_capwatch/development/capwatch-backend:${DEPLOYMENT_VERSION}
+    stdin_open: true
+    ports:
+      - "${BACKEND_PORT}:80"
+    networks:
+      - capwatch
+  db:
+    container_name: capwatch-database
+    image: 'docker.io/bitnami/mongodb:4.4'
+    ports:
+      - "${DB_PORT}:27017"
+    volumes:
+      - './CapWatchBackend.DataAccess.MongoDB/images/:/docker-entrypoint-initdb.d'
+      - './CapWatchBackend.DataAccess.MongoDB/images/mongodb-persistence:/bitnami/mongodb'
+    environment:
+      - MONGODB_EXTRA_FLAGS=--wiredTigerCacheSizeGB=2
+      - MONGODB_ROOT_PASSWORD=netwitness
+    networks:
+      - capwatch

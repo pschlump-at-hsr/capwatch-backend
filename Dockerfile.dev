@@ -1,0 +1,27 @@
+# build environment
+FROM mcr.microsoft.com/dotnet/sdk:5.0
+
+WORKDIR /app
+
+COPY *.sln ./
+COPY CapWatchBackend.Application/*.csproj ./CapWatchBackend.Application/
+COPY CapWatchBackend.DataAccess.MongoDB/*.csproj ./CapWatchBackend.DataAccess.MongoDB/
+COPY CapWatchBackend.Domain/*.csproj ./CapWatchBackend.Domain/
+COPY CapWatchBackend.WebApi/*.csproj ./CapWatchBackend.WebApi/
+COPY CapWatchBackend.WebApi.Tests/*.csproj ./CapWatchBackend.WebApi.Tests/
+COPY CapWatchBackend.DataAccess.MongoDB.Tests/*.csproj ./CapWatchBackend.DataAccess.MongoDB.Tests/
+COPY CapWatchBackend.Application.Tests/*.csproj ./CapWatchBackend.Application.Tests/
+
+RUN dotnet restore
+
+COPY . ./
+
+RUN dotnet publish -c Release -o out
+RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
+RUN apt-get update \
+    && apt-get install -y apt-utils \
+    && apt-get install -y --no-install-recommends openjdk-11-jre
+
+EXPOSE 80
+
+ENTRYPOINT ["dotnet", ""]

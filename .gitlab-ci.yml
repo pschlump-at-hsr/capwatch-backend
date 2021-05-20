@@ -1,0 +1,135 @@
+variables:
+  DOCKER_IMAGE_DOCKER: docker:stable-dind
+  SONARQUBE_HOST: https://se1-sonarqube.dev.ifs.hsr.ch
+  NAME_LATEST_TAG: latest
+  NAME_DEVELOP_TAG: develop
+  SOLUTION: "CapWatchBackend.sln"
+  TEST_RESULTS: "/root/TestResults"
+  API_TEST_DIR: "CapWatchBackend.Application.Tests"
+  APP_TEST_DIR: "CapWatchBackend.WebApi.Tests"
+  DB_TEST_DIR: "CapWatchBackend.DataAccess.MongoDB.Tests"
+  Code_Coverage: "Code Coverage"
+
+image: $DOCKER_IMAGE_DOCKER
+
+stages:
+  - build
+  - sonarqube-build
+  - sonarqube-check
+  - test
+  - tag-develop
+  - tag-master
+  - deploy-develop
+  - deploy-master
+
+services:
+  - docker:dind
+  
+
+# Build image for every commit
+Build:
+  stage: build
+  script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG || true
+    # The built image is tagged locally with the commit SHA
+    - >
+      docker build
+      --pull
+      --build-arg VCS_REF=$CI_COMMIT_SHA
+      --build-arg VCS_URL=$CI_PROJECT_URL
+      --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+      --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+Sonarqube-Build:
+   stage: sonarqube-build
+   script: 
+      - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+      - docker pull $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG || true
+      # The built image is tagged locally with the commit SHA
+      - >
+        docker build
+        --pull
+        --file Dockerfile.dev
+        --build-arg VCS_REF=$CI_COMMIT_SHA
+        --build-arg VCS_URL=$CI_PROJECT_URL
+        --cache-from $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+        --tag $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+        .
+      - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+   only: ['merge_requests', 'develop', 'master']
+
+Sonarqube-Check:
+   stage: sonarqube-check
+   image: 
+    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+    entrypoint: [""]
+   script:
+      - "dotnet tool install --global dotnet-sonarscanner"
+      - "dotnet tool install --global dotnet-reportgenerator-globaltool"
+      - "export PATH=$PATH:/root/.dotnet/tools"
+      - "dotnet sonarscanner begin /k:CapwatchBackend  /d:sonar.login=${SONARQUBE_TOKEN} /d:sonar.qualitygate.wait=true /d:sonar.host.url=${SONARQUBE_HOST} /d:sonar.coverageReportPaths=${TEST_RESULTS}/SonarQube.xml"
+      - "dotnet build ${SOLUTION}"
+      - "dotnet test ${API_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/api /p:CoverletOutputFormat=opencover"
+      - "dotnet test ${APP_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/app /p:CoverletOutputFormat=opencover"
+      - "dotnet test ${DB_TEST_DIR} /p:CollectCoverage=true /p:CoverletOutput=${TEST_RESULTS}/db /p:CoverletOutputFormat=opencover"
+      - "reportgenerator -reports:\"${TEST_RESULTS}/db.opencover.xml;${TEST_RESULTS}/api.opencover.xml;${TEST_RESULTS}/app.opencover.xml\" -targetdir:${TEST_RESULTS} -reporttypes:SonarQube"
+      - "dotnet sonarscanner end  /d:sonar.login=${SONARQUBE_TOKEN}"
+   only: ['merge_requests', 'develop', 'master']
+
+
+Test:
+  stage: test
+  image:
+    name: $CI_REGISTRY_IMAGE:${CI_COMMIT_SHA}_Dev_Build
+    entrypoint: [""]
+  only: ['merge_requests', 'develop', 'master']
+  script:
+    - "dotnet test"
+
+
+Tag develop:
+  stage: tag-develop
+  variables:
+    GIT_STRATEGY: none
+  only:
+    - develop
+  script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    # Tag it "develop"
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+    - docker push $CI_REGISTRY_IMAGE:$NAME_DEVELOP_TAG
+
+Tag master:
+  stage: tag-master
+  variables:
+    GIT_STRATEGY: none
+  only: [ 'tags', 'master' ]
+  script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    # Tag it with the latest tag
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    # Tag it latest for the latest master commit
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
+    - docker push $CI_REGISTRY_IMAGE:$NAME_LATEST_TAG
+
+# TODO implement
+Deploy develop:
+  stage: deploy-develop
+  only:
+    - develop
+  script:
+    - echo "Hello from develop deployment"
+
+# TODO implement
+Deploy master:
+  stage: deploy-master
+  only:
+    - master
+  script:
+    - echo "Hello from master deployment"
