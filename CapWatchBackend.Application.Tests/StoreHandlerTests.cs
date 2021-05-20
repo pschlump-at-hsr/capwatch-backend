@@ -7,6 +7,7 @@ using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -71,7 +72,7 @@ namespace CapWatchBackend.ApplicationTests {
     [InlineData("600", "00000000-0000-0000-0000-000000000006")]
     public async Task TestGetStoresFilterWorksForAllExpectedFieldsAsync(string filter, string guidShouldBe) {
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStoresAsync(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
+      A.CallTo(() => repository.GetStoresAsync(A<Expression<Func<Store, bool>>>._)).ReturnsLazily((Expression<Func<Store, bool>> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction.Compile()).ToList());
 
       var storeHandler = new StoreHandler(repository);
       var stores = await storeHandler.GetStoresAsync(filter);
@@ -82,7 +83,7 @@ namespace CapWatchBackend.ApplicationTests {
     [Fact]
     public async Task TestGetStoresFilterAppliesToMoreThanOneAsync() {
       var repository = A.Fake<IStoreRepository>();
-      A.CallTo(() => repository.GetStoresAsync(A<Func<Store, bool>>._)).ReturnsLazily((Func<Store, bool> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction).ToList());
+      A.CallTo(() => repository.GetStoresAsync(A<Expression<Func<Store, bool>>>._)).ReturnsLazily((Expression<Func<Store, bool>> filterFunction) => GetStoreListForGetStoresTest().Where(filterFunction.Compile()).ToList());
 
       var storeHandler = new StoreHandler(repository);
       var stores = await storeHandler.GetStoresAsync("00");
