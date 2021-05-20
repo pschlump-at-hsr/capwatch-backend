@@ -40,3 +40,7 @@ msbuild.wrn
 
 *.orig
 /CapWatchBackend.DataAccess.MongoDB/images/docker-entrypoint-initdb.d/config.js
+
+# Code Coverage Files
+*coverage*.xml
+/TestResults/*

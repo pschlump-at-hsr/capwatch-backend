@@ -3,8 +3,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog.Web;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CapWatchBackend.WebApi {
+  [ExcludeFromCodeCoverage]
   public static class Program {
     public static void Main(string[] args) {
       var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();

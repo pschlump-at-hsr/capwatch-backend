@@ -1,6 +1,7 @@
 using CapWatchBackend.Application.Handlers;
 using CapWatchBackend.Application.Repositories;
 using CapWatchBackend.DataAccess.MongoDB;
+using CapWatchBackend.DataAccess.MongoDB.DbContext;
 using CapWatchBackend.DataAccess.MongoDB.Repositories;
 using CapWatchBackend.WebApi.ActionFilter;
 using CapWatchBackend.WebApi.Hubs;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CapWatchBackend.WebApi {
   public class Startup {
@@ -65,10 +67,12 @@ namespace CapWatchBackend.WebApi {
       });
     }
 
+    [ExcludeFromCodeCoverage]
     protected virtual void RegisterDependencies(IServiceCollection services) {
       services.AddSingleton<IStoreRepository, StoreRepository>();
       services.AddSingleton<IStoreHandler, StoreHandler>();
       services.Configure<DatabaseConfiguration>(Configuration.GetSection(nameof(DatabaseConfiguration)));
+      services.AddSingleton<ICapwatchDBContext, CapwatchDBContext>();
     }
   }
 }
