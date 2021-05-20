@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
@@ -92,10 +93,10 @@ namespace CapWatchBackend.DataAccess.MongoDB.Repositories {
       }
     }
 
-    public async Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter) {
+    public async Task<IEnumerable<Store>> GetStoresAsync(Expression<Func<Store, bool>> filter) {
       try {
         return await Task.Factory.StartNew(() => {
-          return _storesCol.Find(store => filter(store)).ToList();
+          return _storesCol.Find(filter).ToList();
         });
       } catch (MongoClientException e) {
         throw new RepositoryException(e.Message, e);

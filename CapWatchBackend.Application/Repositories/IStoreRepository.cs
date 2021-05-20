@@ -1,6 +1,7 @@
 ﻿using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace CapWatchBackend.Application.Repositories {
@@ -12,7 +13,7 @@ namespace CapWatchBackend.Application.Repositories {
     public Task UpdateStoresAsync(IEnumerable<Store> stores);
 
     public Task<IEnumerable<Store>> GetStoresAsync();
-    public Task<IEnumerable<Store>> GetStoresAsync(Func<Store, bool> filter);
+    public Task<IEnumerable<Store>> GetStoresAsync(Expression<Func<Store, bool>> filter);
     public Task<Store> GetStoreAsync(Guid id);
 
     public Task DeleteAllStoresAsync();
