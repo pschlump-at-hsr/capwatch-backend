@@ -11,6 +11,8 @@ services:
     stdin_open: true
     ports:
       - "8080:80"
+    env_file: 
+      - .env
     networks:
       - capwatch
   db:
