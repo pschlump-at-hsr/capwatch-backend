@@ -4,6 +4,7 @@ using CapWatchBackend.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -37,9 +38,10 @@ namespace CapWatchBackend.Application.Handlers {
     }
 
     public Task<IEnumerable<Store>> GetStoresAsync(string filter) {
-      bool filterFunction(Store store) => store.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-        || store.Street.Contains(filter, StringComparison.CurrentCultureIgnoreCase)
-        || store.City.Contains(filter, StringComparison.CurrentCultureIgnoreCase);
+      Expression<Func<Store, bool>> filterFunction = store =>
+        store.Name.ToLower().Contains(filter.ToLower())
+          || store.Street.ToLower().Contains(filter.ToLower())
+          || store.City.ToLower().Contains(filter.ToLower());
 
       return _repository.GetStoresAsync(filterFunction);
     }

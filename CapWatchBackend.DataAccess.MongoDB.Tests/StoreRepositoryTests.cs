@@ -9,6 +9,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -162,7 +163,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
 
     [Fact]
     public async Task TestGetStoresAsyncFiltered() {
-      static bool filterFunction(Store store) => store.Name.Equals("Ikea");
+      Expression<Func<Store, bool>> filterFunction = store => store.Name.Equals("Ikea");
 
       var context = A.Fake<ICapwatchDBContext>();
       var storeCollection = GetFakeStoreCollection(GetTestStores(), filterFunction);
@@ -178,7 +179,7 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
 
     [Fact]
     public async Task TestGetStoresAsyncFilteredNoResult() {
-      static bool filterFunction(Store store) => store.Name.Equals("Invalid");
+      Expression<Func<Store, bool>> filterFunction = store => store.Name.Equals("Invalid");
 
       var context = A.Fake<ICapwatchDBContext>();
       var storeCollection = GetFakeStoreCollection(GetTestStores(), filterFunction);
@@ -346,14 +347,14 @@ namespace CapWatchBackend.DataAccess.MongoDB.Tests {
       return collection;
     }
 
-    private static IMongoCollection<Store> GetFakeStoreCollection(IList<Store> findReturnValue = null, Func<Store, bool> filter = null) {
+    private static IMongoCollection<Store> GetFakeStoreCollection(IList<Store> findReturnValue = null, Expression<Func<Store, bool>> filter = null) {
       var collection = A.Fake<IMongoCollection<Store>>();
       var asyncCursor = A.Fake<IAsyncCursor<Store>>();
 
       A.CallTo(() => collection.FindSync(A<FilterDefinition<Store>>._, A<FindOptions<Store>>._, default)).Returns(asyncCursor);
 
       A.CallTo(() => asyncCursor.MoveNext(default)).ReturnsNextFromSequence(true, false);
-      A.CallTo(() => asyncCursor.Current).Returns(filter == null ? findReturnValue : findReturnValue.Where(filter));
+      A.CallTo(() => asyncCursor.Current).Returns(filter == null ? findReturnValue : findReturnValue.Where(filter.Compile()));
 
       return collection;
     }
